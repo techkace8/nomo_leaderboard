@@ -24,18 +24,18 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif;background:#ffffff!impor
 .logo{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;letter-spacing:-.02em;line-height:1;margin-bottom:4px}
 .logo em{font-style:italic;color:#0F6E56}
 .tagline{font-size:11px;color:#99998f;letter-spacing:.12em;text-transform:uppercase;font-family:monospace}
-.divider{height:1px;background:#e8e7e2;margin:20px 0}
+.divider{height:1px;background:#111;margin:20px 0}
 
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:24px 0}
-.mc{background:#fff;border:1px solid #eeeee9;border-radius:12px;padding:16px 18px}
+.mc{background:#fff;border:1px solid #111;border-radius:12px;padding:16px 18px}
 .mc-l{font-size:10px;color:#99998f;text-transform:uppercase;letter-spacing:.1em;font-family:monospace;margin-bottom:6px}
 .mc-v{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:#111;line-height:1}
 .mc-s{font-size:11px;color:#99998f;margin-top:3px}
 
 .stitle{font-size:10px;font-weight:500;color:#99998f;text-transform:uppercase;letter-spacing:.12em;font-family:monospace;margin-bottom:12px;margin-top:24px}
 
-.lb{background:#fff;border:1px solid #eeeee9;border-radius:10px;padding:14px 18px;margin-bottom:7px;display:flex;align-items:center;gap:12px}
-.lb:hover{border-color:#d4d3cc}
+.lb{background:#fff;border:1px solid #111;border-radius:10px;padding:14px 18px;margin-bottom:7px;display:flex;align-items:center;gap:12px}
+.lb:hover{border-color:#000}
 .lb-medal{font-size:18px;width:26px;text-align:center;flex-shrink:0}
 .lb-rank{font-size:12px;color:#99998f;width:18px;text-align:center;font-family:monospace;flex-shrink:0}
 .lb-name{font-size:14px;font-weight:500;color:#111;width:100px;flex-shrink:0}
@@ -53,8 +53,8 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif;background:#ffffff!impor
 .b-starting{background:#f5f5f2;color:#99998f}
 
 .break-table{width:100%;border-collapse:collapse;font-size:12px}
-.break-table th{text-align:left;padding:7px 10px;color:#99998f;font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-family:monospace;font-weight:500;border-bottom:1px solid #eeeee9}
-.break-table td{padding:10px;border-bottom:1px solid #f5f5f2;color:#111}
+.break-table th{text-align:left;padding:7px 10px;color:#99998f;font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-family:monospace;font-weight:500;border-bottom:1px solid #111}
+.break-table td{padding:10px;border-bottom:1px solid #e0e0e0;color:#111}
 .break-table tr:last-child td{border-bottom:none}
 .break-table tr:hover td{background:#fafaf8}
 .td-score{font-weight:500;color:#0F6E56}
