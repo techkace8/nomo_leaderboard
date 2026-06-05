@@ -20,6 +20,9 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif!important;background:#ff
 [data-testid="stAppViewContainer"],[data-testid="stMain"],[data-testid="block-container"]{background:#ffffff!important}
 .block-container{padding:3rem 4rem 5rem!important;max-width:1000px!important}
 #MainMenu,footer,header{visibility:hidden}
+[data-testid="stToolbar"]{display:none}
+.viewerBadge_container__1QSob{display:none!important}
+#stDecoration{display:none}
 
 /* HEADER */
 .nomo-title{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:900;color:#111;letter-spacing:-.03em;line-height:1}
