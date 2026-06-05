@@ -211,20 +211,23 @@ for _,row in df.iterrows():
 st.markdown('<div class="divider"></div>',unsafe_allow_html=True)
 st.markdown('<div class="stitle">Score breakdown</div>',unsafe_allow_html=True)
 
-dcols={"NAME":"Name","STREAK":"Streak","BI-WEEKLY HRS":"Bi-wkly hrs",
-       "PASSION BALANCE":"Balance","AVG ENERGY":"Energy","WINS":"Wins",sc:"Score"}
-show=[c for c in dcols if c and c in df.columns]
-if show:
+if sc and len(df)>0:
     rows=""
     for _,row in df.iterrows():
         score_val=float(row.get(sc,0)) if sc else 0
+        # find columns flexibly
+        streak_val=next((row.get(c,"—") for c in df.columns if "STREAK" in c.upper()),("—"))
+        hrs_val=next((row.get(c,"—") for c in df.columns if "HRS" in c.upper() or "HOUR" in c.upper()),("—"))
+        bal_val=next((row.get(c,"—") for c in df.columns if "BALANCE" in c.upper() or "PASSION" in c.upper()),("—"))
+        eng_val=next((row.get(c,"—") for c in df.columns if "ENERGY" in c.upper()),("—"))
+        win_val=next((row.get(c,"—") for c in df.columns if "WIN" in c.upper()),("—"))
         rows+=f"""<tr>
-          <td>{row.get(nc,'—')}</td>
-          <td class="td-muted">{row.get('STREAK','—')}</td>
-          <td class="td-muted">{row.get('BI-WEEKLY HRS','—')}h</td>
-          <td class="td-muted">{row.get('PASSION BALANCE','—')}</td>
-          <td class="td-muted">{row.get('AVG ENERGY','—')}</td>
-          <td class="td-muted">{row.get('WINS','—')}</td>
+          <td>{row.get(nc,"—")}</td>
+          <td class="td-muted">{streak_val}</td>
+          <td class="td-muted">{hrs_val}h</td>
+          <td class="td-muted">{bal_val}</td>
+          <td class="td-muted">{eng_val}</td>
+          <td class="td-muted">{win_val}</td>
           <td class="td-score">{score_val:.1f}</td>
         </tr>"""
     st.markdown(f"""
