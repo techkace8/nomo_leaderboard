@@ -16,8 +16,10 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500&display=swap');
 
-html,body,[class*="css"]{font-family:'Inter',sans-serif}
-.block-container{padding:2.5rem 3rem 4rem;max-width:960px}
+html,body,[class*="css"]{font-family:'Inter',sans-serif;background:#ffffff!important}
+[data-testid="stAppViewContainer"]{background:#ffffff!important}
+[data-testid="stMain"]{background:#ffffff!important}
+.block-container{padding:2.5rem 3rem 4rem;max-width:960px;background:#ffffff}
 
 .logo{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;letter-spacing:-.02em;line-height:1;margin-bottom:4px}
 .logo em{font-style:italic;color:#0F6E56}
