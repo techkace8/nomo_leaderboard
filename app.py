@@ -67,6 +67,10 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif;background:#ffffff!impor
 .info-bar{background:#f5f5f2;border-radius:8px;padding:10px 14px;font-size:12px;color:#99998f;font-family:monospace;margin-bottom:20px}
 
 [data-testid="stSidebar"]{background:#fafaf8}
+header[data-testid="stHeader"]{background:#ffffff!important}
+#MainMenu{visibility:hidden}
+footer{visibility:hidden}
+header{visibility:hidden}
 </style>
 """, unsafe_allow_html=True)
 
