@@ -81,6 +81,28 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif!important;background:#ff
 .band-pill:last-child{border-right:none}
 
 [data-testid="stSidebar"]{background:#fafaf8!important}
+
+@media(max-width:768px){
+  .block-container{padding:1.5rem 1.2rem 3rem!important}
+  .nomo-title{font-size:1.6rem!important}
+  .metric-grid{grid-template-columns:repeat(2,1fr)!important}
+  .metric-cell:nth-child(2){border-right:none!important}
+  .metric-cell:nth-child(3){border-top:2px solid #111!important}
+  .metric-cell:nth-child(4){border-top:2px solid #111!important;border-right:none!important}
+  .lb-row{flex-wrap:wrap;gap:8px;padding:12px 14px}
+  .lb-name{width:80px!important;font-size:13px!important}
+  .lb-score{font-size:1.1rem!important;width:52px!important}
+  .lb-bar-bg{width:100%!important;order:5;flex-basis:100%}
+  .lb-badge{font-size:8px!important}
+  .lb-chg{width:30px!important}
+  .wt-row{flex-wrap:wrap}
+  .wt-pill{flex-basis:33%!important;border-bottom:1.5px solid #111}
+  .band-row{flex-wrap:wrap}
+  .band-pill{flex-basis:33%!important;border-bottom:1.5px solid #111}
+  .bd-table{font-size:11px!important}
+  .bd-table th,.bd-table td{padding:7px 8px!important}
+  .nomo-updated{font-size:10px!important;padding-top:8px!important}
+}
 </style>
 """, unsafe_allow_html=True)
 
