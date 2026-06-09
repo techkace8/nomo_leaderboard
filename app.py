@@ -98,6 +98,38 @@ button[kind="header"]{display:none!important}
 
 [data-testid="stSidebar"]{background:#fafaf8!important}
 
+/* REFRESH BUTTON — outlined pill matching the editorial design */
+div[data-testid="stButton"] > button{
+  background:#fff!important;
+  color:#111!important;
+  border:1.5px solid #111!important;
+  border-radius:0!important;
+  font-family:monospace!important;
+  font-size:11px!important;
+  font-weight:600!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase!important;
+  padding:9px 4px!important;
+  margin-top:18px!important;
+  box-shadow:none!important;
+  transition:background .12s ease,color .12s ease;
+}
+div[data-testid="stButton"] > button:hover:not(:disabled){
+  background:#1a6b4a!important;
+  color:#fff!important;
+  border-color:#1a6b4a!important;
+}
+div[data-testid="stButton"] > button:active:not(:disabled){
+  background:#111!important;border-color:#111!important;color:#fff!important;
+}
+div[data-testid="stButton"] > button:disabled{
+  background:#f5f5f3!important;
+  color:#aaa!important;
+  border-color:#ddd!important;
+  cursor:not-allowed;
+}
+div[data-testid="stButton"] > button:focus{box-shadow:none!important;outline:none!important}
+
 @media(max-width:768px){
   .block-container{padding:1.5rem 1.2rem 3rem!important}
   .nomo-title{font-size:1.6rem!important}
@@ -261,13 +293,13 @@ with c2:
     last = st.session_state.get("last_refresh", 0.0)
     remaining = int(COOLDOWN_SECONDS - (time.time() - last))
     if not REFRESH_URL:
-        st.button("🔄 Refresh", disabled=True, use_container_width=True,
+        st.button("↻ REFRESH", disabled=True, use_container_width=True,
                   help="Set REFRESH_URL in secrets to enable live refresh")
     elif remaining > 0:
-        st.button(f"⏳ {remaining}s", disabled=True, use_container_width=True,
+        st.button(f"↻ 0:{remaining:02d}", disabled=True, use_container_width=True,
                   help="Cooling down to avoid spamming the sync")
     else:
-        if st.button("🔄 Refresh", use_container_width=True,
+        if st.button("↻ REFRESH", use_container_width=True,
                      help="Recompute the leaderboard from everyone's latest logs"):
             with st.spinner("Syncing leaderboard…"):
                 ok, msg = trigger_sync()
