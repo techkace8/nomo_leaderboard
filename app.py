@@ -154,12 +154,12 @@ def load_sheet(url, creds_json):
 
 def sample():
     return pd.DataFrame([
-        {"RANK":1,"NAME":"Aditya",  "STREAK":14,"BI-WEEKLY HRS":22,"PASSION BALANCE":3,"AVG ENERGY":4.4,"WINS":13,"NOMO SCORE":82.1,"PREV SCORE":78.5},
-        {"RANK":2,"NAME":"Rohan",   "STREAK":13,"BI-WEEKLY HRS":25,"PASSION BALANCE":3,"AVG ENERGY":3.9,"WINS":11,"NOMO SCORE":79.4,"PREV SCORE":81.0},
-        {"RANK":3,"NAME":"Meera",   "STREAK":10,"BI-WEEKLY HRS":14,"PASSION BALANCE":3,"AVG ENERGY":3.7,"WINS":9, "NOMO SCORE":63.2,"PREV SCORE":60.0},
-        {"RANK":4,"NAME":"Priya",   "STREAK":8, "BI-WEEKLY HRS":12,"PASSION BALANCE":2,"AVG ENERGY":4.1,"WINS":7, "NOMO SCORE":55.8,"PREV SCORE":54.0},
-        {"RANK":5,"NAME":"Karthik", "STREAK":6, "BI-WEEKLY HRS":9, "PASSION BALANCE":2,"AVG ENERGY":3.5,"WINS":5, "NOMO SCORE":44.7,"PREV SCORE":46.0},
-        {"RANK":6,"NAME":"Divya",   "STREAK":5, "BI-WEEKLY HRS":7, "PASSION BALANCE":1,"AVG ENERGY":3.2,"WINS":4, "NOMO SCORE":36.1,"PREV SCORE":33.0},
+        {"RANK":1,"NAME":"Aditya",  "STREAK":14,"AVG ENERGY":4.4,"WINS":13,"NOMO SCORE":82.1,"PREV SCORE":78.5},
+        {"RANK":2,"NAME":"Rohan",   "STREAK":13,"AVG ENERGY":3.9,"WINS":11,"NOMO SCORE":79.4,"PREV SCORE":81.0},
+        {"RANK":3,"NAME":"Meera",   "STREAK":10,"AVG ENERGY":3.7,"WINS":9, "NOMO SCORE":63.2,"PREV SCORE":60.0},
+        {"RANK":4,"NAME":"Priya",   "STREAK":8, "AVG ENERGY":4.1,"WINS":7, "NOMO SCORE":55.8,"PREV SCORE":54.0},
+        {"RANK":5,"NAME":"Karthik", "STREAK":6, "AVG ENERGY":3.5,"WINS":5, "NOMO SCORE":44.7,"PREV SCORE":46.0},
+        {"RANK":6,"NAME":"Divya",   "STREAK":5, "AVG ENERGY":3.2,"WINS":4, "NOMO SCORE":36.1,"PREV SCORE":33.0},
     ])
 
 # ── sidebar ───────────────────────────────────────────────
@@ -254,22 +254,20 @@ if sc and len(df) > 0:
     for _, row in df.iterrows():
         sv = float(row.get(sc, 0)) if sc else 0
         stk = next((row.get(c,"—") for c in df.columns if "STREAK" in c.upper()), "—")
-        hrs = next((row.get(c,"—") for c in df.columns if "HRS" in c.upper() or "HOUR" in c.upper()), "—")
-        bal = next((row.get(c,"—") for c in df.columns if "BALANCE" in c.upper()), "—")
         eng = next((row.get(c,"—") for c in df.columns if "ENERGY" in c.upper()), "—")
         win = next((row.get(c,"—") for c in df.columns if "WIN" in c.upper()), "—")
+        prv = next((row.get(c,"—") for c in df.columns if "PREV" in c.upper()), "—")
         rows += f"""<tr>
           <td>{row.get(nc,"—")}</td>
-          <td class="td-m">{stk}</td><td class="td-m">{hrs}h</td>
-          <td class="td-m">{bal}</td><td class="td-m">{eng}</td>
-          <td class="td-m">{win}</td>
+          <td class="td-m">{stk}</td><td class="td-m">{eng}</td>
+          <td class="td-m">{win}</td><td class="td-m">{prv}</td>
           <td class="td-score">{sv:.1f}</td>
         </tr>"""
     st.markdown(f"""
     <table class="bd-table">
       <thead><tr>
-        <th>Name</th><th>Streak</th><th>Bi-wkly hrs</th>
-        <th>Balance</th><th>Energy</th><th>Wins</th><th>Score</th>
+        <th>Name</th><th>Streak</th><th>Avg Energy</th>
+        <th>Wins</th><th>Prev Score</th><th>Score</th>
       </tr></thead>
       <tbody>{rows}</tbody>
     </table>""", unsafe_allow_html=True)
@@ -279,11 +277,10 @@ st.markdown('<hr class="nomo-divider" style="margin-top:32px">', unsafe_allow_ht
 st.markdown('<div class="sec-title">How scores are calculated</div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="wt-row">
-  <div class="wt-pill">Streak<span>30%</span></div>
-  <div class="wt-pill">Bi-wkly hrs<span>25%</span></div>
-  <div class="wt-pill">Passion balance<span>20%</span></div>
-  <div class="wt-pill">Avg energy<span>15%</span></div>
-  <div class="wt-pill">Wins logged<span>10%</span></div>
+  <div class="wt-pill">Streak<span>40%</span></div>
+  <div class="wt-pill">Avg energy<span>30%</span></div>
+  <div class="wt-pill">Wins logged<span>20%</span></div>
+  <div class="wt-pill">Prev score<span>display only</span></div>
 </div>
 <div class="band-row" style="margin-top:10px">
   <div class="band-pill" style="background:#e8f5f0;color:#085041">Elite<br><b>90+</b></div>
