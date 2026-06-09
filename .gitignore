@@ -4,3 +4,15 @@
 superceded/
 __pycache__/
 .env
+
+# Google service account key — NEVER commit
+service_account.json
+*-service-account.json
+*.credentials.json
+
+# Generated secrets block (contains private key) — NEVER commit
+streamlit_secrets_block.txt
+.streamlit/secrets.toml
+
+# gen_secrets.py embeds the token + sheet id — keep local only
+gen_secrets.py

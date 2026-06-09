@@ -3,8 +3,11 @@
 // Set trigger: Triggers → Add → syncScores → Time-driven → Day timer → 11pm
 // Add more mentees: just add their URL to the array — no other changes needed
 
+// ADMIN sheet (1YZ0b...) is listed first as a test member so you can verify
+// the sync end-to-end with data you control. Replace these with real member
+// sheet URLs as people join — just paste each member's sheet URL.
 const MENTEE_SHEETS = [
-  "https://docs.google.com/spreadsheets/d/1iVh6CR94BuF5QTdg5krQeMwUuuqlYrfpcuEkpfAViao/edit?usp=sharing", // Multipassionate 1
+  "https://docs.google.com/spreadsheets/d/1YZ0b-f6Kyl8r60sXf0jBYo63YfLHe0KPM9Q62CQnxts/edit", // Multipassionate 1 (TEST = admin sheet itself)
   "PASTE_SHEET_URL_HERE", // Multipassionate 2
   "PASTE_SHEET_URL_HERE", // Multipassionate 3
   "PASTE_SHEET_URL_HERE", // Multipassionate 4
@@ -16,7 +19,8 @@ const MENTEE_SHEETS = [
   "PASTE_SHEET_URL_HERE", // Multipassionate 10
 ];
 
-// Convert any date value from Google Sheets to a clean JS Date at midnight
+// Convert any date value from Goog
+// le Sheets to a clean JS Date at midnight
 function parseSheetDate(val) {
   if (!val || val === "") return null;
   try {
@@ -134,6 +138,39 @@ function syncScores() {
   range.setValues(data);
 
   Logger.log("NOMO synced at " + new Date());
+}
+
+// ─────────────────────────────────────────────────────────
+// WEB APP ENTRY POINT — lets the Streamlit "Refresh" button
+// trigger a sync on demand via a URL.
+//
+// Deploy: Apps Script editor → Deploy → New deployment →
+//   type "Web app" → Execute as "Me" → Access "Anyone" → Deploy.
+// Copy the Web App URL into app.py (REFRESH_URL).
+//
+// Optional shared secret: set SCRIPT_TOKEN below and pass ?token=... in the
+// request so random visitors can't trigger your sync. Leave "" to disable.
+// ─────────────────────────────────────────────────────────
+const SCRIPT_TOKEN = "PASTE_YOUR_SECRET_TOKEN_HERE"; // must match SCRIPT_TOKEN in Streamlit secrets — keep the real value out of public code
+
+function doGet(e) {
+  const out = { ok: false };
+  try {
+    if (SCRIPT_TOKEN && (!e || !e.parameter || e.parameter.token !== SCRIPT_TOKEN)) {
+      out.error = "unauthorized";
+      return ContentService
+        .createTextOutput(JSON.stringify(out))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    syncScores();
+    out.ok = true;
+    out.synced_at = new Date().toISOString();
+  } catch (err) {
+    out.error = err.message;
+  }
+  return ContentService
+    .createTextOutput(JSON.stringify(out))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 // ─────────────────────────────────────────────────────────

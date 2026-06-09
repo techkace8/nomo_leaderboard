@@ -3,7 +3,16 @@ import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
 import json
+import time
+import requests
 from datetime import datetime
+
+# ── refresh button config ─────────────────────────────────
+# Web App URL from: Apps Script → Deploy → New deployment → Web app.
+# Paste the /exec URL here (or set it in Streamlit secrets as REFRESH_URL).
+REFRESH_URL = st.secrets.get("REFRESH_URL", "")
+SCRIPT_TOKEN = st.secrets.get("SCRIPT_TOKEN", "")  # set in Streamlit secrets — never hardcode
+COOLDOWN_SECONDS = 60
 
 st.set_page_config(
     page_title="NOMO — Top Achievers",
@@ -139,18 +148,53 @@ def medal(r):
     return {1:"🥇",2:"🥈",3:"🥉"}.get(r, str(r))
 
 # ── data ─────────────────────────────────────────────────
+SCOPES = ["https://spreadsheets.google.com/feeds",
+          "https://www.googleapis.com/auth/drive"]
+
 @st.cache_data(ttl=300)
 def load_sheet(url, creds_json):
+    """Connect using a service-account JSON string (sidebar path)."""
     try:
-        c = Credentials.from_service_account_info(
-            json.loads(creds_json),
-            scopes=["https://spreadsheets.google.com/feeds",
-                    "https://www.googleapis.com/auth/drive"])
+        c = Credentials.from_service_account_info(json.loads(creds_json), scopes=SCOPES)
         gc = gspread.authorize(c)
         ws = gc.open_by_url(url).worksheet("🏆 Top_Achievers")
         return pd.DataFrame(ws.get_all_records()), None
     except Exception as e:
         return None, str(e)
+
+@st.cache_data(ttl=300)
+def load_sheet_from_secrets():
+    """Auto-connect using SHEET_URL + [gcp_service_account] in Streamlit secrets."""
+    try:
+        sa = dict(st.secrets["gcp_service_account"])
+        url = st.secrets["SHEET_URL"]
+        c = Credentials.from_service_account_info(sa, scopes=SCOPES)
+        gc = gspread.authorize(c)
+        ws = gc.open_by_url(url).worksheet("🏆 Top_Achievers")
+        return pd.DataFrame(ws.get_all_records()), None
+    except Exception as e:
+        return None, str(e)
+
+def has_secrets():
+    try:
+        return "gcp_service_account" in st.secrets and "SHEET_URL" in st.secrets
+    except Exception:
+        return False
+
+def trigger_sync():
+    """Call the Apps Script Web App to recompute the leaderboard on demand.
+    Returns (ok: bool, message: str)."""
+    if not REFRESH_URL:
+        return False, "No REFRESH_URL configured"
+    try:
+        params = {"token": SCRIPT_TOKEN} if SCRIPT_TOKEN else {}
+        r = requests.get(REFRESH_URL, params=params, timeout=60)
+        data = r.json()
+        if data.get("ok"):
+            return True, "Synced"
+        return False, data.get("error", "Sync failed")
+    except Exception as e:
+        return False, str(e)
 
 def sample():
     return pd.DataFrame([
@@ -163,24 +207,34 @@ def sample():
     ])
 
 # ── sidebar ───────────────────────────────────────────────
+url, creds = "", ""
 with st.sidebar:
-    st.markdown("### Connect your sheet")
-    url = st.text_input("Top_Achievers Sheet URL", placeholder="https://docs.google.com/spreadsheets/...")
-    creds = st.text_area("Service Account JSON", placeholder='{"type":"service_account"...}', height=120)
-    st.button("Connect", use_container_width=True)
-    st.markdown("---")
-    st.caption("No sheet connected? Sample data loads automatically.")
-    st.markdown("---")
-    st.markdown("**Get credentials:**")
-    st.caption("1. console.cloud.google.com → New project")
-    st.caption("2. Enable Sheets API + Drive API")
-    st.caption("3. Create Service Account → download JSON")
-    st.caption("4. Share sheet with service account email (viewer)")
+    if has_secrets():
+        st.markdown("### ✅ Connected")
+        st.caption("Live leaderboard — auto-connected via app secrets.")
+    else:
+        st.markdown("### Connect your sheet")
+        url = st.text_input("Top_Achievers Sheet URL", placeholder="https://docs.google.com/spreadsheets/...")
+        creds = st.text_area("Service Account JSON", placeholder='{"type":"service_account"...}', height=120)
+        st.button("Connect", use_container_width=True)
+        st.markdown("---")
+        st.caption("No sheet connected? Sample data loads automatically.")
+        st.markdown("---")
+        st.markdown("**Get credentials:**")
+        st.caption("1. console.cloud.google.com → New project")
+        st.caption("2. Enable Sheets API + Drive API")
+        st.caption("3. Create Service Account → download JSON")
+        st.caption("4. Share sheet with service account email (viewer)")
 
 # ── load ──────────────────────────────────────────────────
 df, err = None, None
 using_sample = False
-if url and creds:
+if has_secrets():
+    # Cloud path: auto-connect to the configured leaderboard
+    df, err = load_sheet_from_secrets()
+    if err: st.sidebar.error(err)
+elif url and creds:
+    # Manual path: credentials pasted in the sidebar
     df, err = load_sheet(url, creds)
     if err: st.sidebar.error(err)
 if df is None:
@@ -195,14 +249,43 @@ if sc:
     df["RANK"] = df.index + 1
 
 # ── header ────────────────────────────────────────────────
-c1, c2 = st.columns([3,1])
+c1, c2, c3 = st.columns([3, 1, 1])
 with c1:
     st.markdown('<div class="nomo-title">NOMO — <em>Top Achievers</em></div>', unsafe_allow_html=True)
     st.markdown('<div class="nomo-tag">15-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
-with c2:
+with c3:
     st.markdown(f'<div class="nomo-updated">{datetime.now().strftime("%d %b %Y · %H:%M")}</div>', unsafe_allow_html=True)
 
+# ── refresh button (60s cooldown) ─────────────────────────
+with c2:
+    last = st.session_state.get("last_refresh", 0.0)
+    remaining = int(COOLDOWN_SECONDS - (time.time() - last))
+    if not REFRESH_URL:
+        st.button("🔄 Refresh", disabled=True, use_container_width=True,
+                  help="Set REFRESH_URL in secrets to enable live refresh")
+    elif remaining > 0:
+        st.button(f"⏳ {remaining}s", disabled=True, use_container_width=True,
+                  help="Cooling down to avoid spamming the sync")
+    else:
+        if st.button("🔄 Refresh", use_container_width=True,
+                     help="Recompute the leaderboard from everyone's latest logs"):
+            with st.spinner("Syncing leaderboard…"):
+                ok, msg = trigger_sync()
+            st.session_state["last_refresh"] = time.time()
+            if ok:
+                # bust caches so the freshly-synced data loads
+                load_sheet.clear()
+                load_sheet_from_secrets.clear()
+                st.rerun()
+            else:
+                st.toast(f"Refresh failed: {msg}", icon="⚠️")
+
 st.markdown('<hr class="nomo-divider">', unsafe_allow_html=True)
+
+# Auto-rerun once per second while cooling down, so the countdown ticks live
+if REFRESH_URL and 0 < int(COOLDOWN_SECONDS - (time.time() - st.session_state.get("last_refresh", 0.0))):
+    time.sleep(1)
+    st.rerun()
 
 if using_sample:
     st.markdown('<div class="info-bar">Sample data — connect your Top_Achievers sheet in the sidebar to go live</div>', unsafe_allow_html=True)
