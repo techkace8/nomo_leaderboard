@@ -1,0 +1,6 @@
+*.xlsx
+*.xls
+~$*
+superceded/
+__pycache__/
+.env
