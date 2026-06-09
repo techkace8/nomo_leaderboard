@@ -1,26 +1,30 @@
 // NOMO Daily Tracker — Apps Script
 // Paste in: Extensions → Apps Script → save
-// Set trigger: Triggers → Add → syncScores → Time-driven → Day timer → 11pm
-// Add more mentees: just add their URL to the array — no other changes needed
+// Set trigger: Triggers → Add → syncScores → Time-driven → Hour timer → Every hour
+//
+// Member sheet URLs live in the "sheet_link" tab (column B, from row 2 down) —
+// NOT in this code. To add a member: add a row in sheet_link with their URL.
+// Re-pasting this script never wipes the member list.
 
-// ADMIN sheet (1YZ0b...) is listed first as a test member so you can verify
-// the sync end-to-end with data you control. Replace these with real member
-// sheet URLs as people join — just paste each member's sheet URL.
-const MENTEE_SHEETS = [
-  "https://docs.google.com/spreadsheets/d/1YZ0b-f6Kyl8r60sXf0jBYo63YfLHe0KPM9Q62CQnxts/edit", // Multipassionate 1 (TEST = admin sheet itself)
-  "PASTE_SHEET_URL_HERE", // Multipassionate 2
-  "PASTE_SHEET_URL_HERE", // Multipassionate 3
-  "PASTE_SHEET_URL_HERE", // Multipassionate 4
-  "PASTE_SHEET_URL_HERE", // Multipassionate 5
-  "PASTE_SHEET_URL_HERE", // Multipassionate 6
-  "PASTE_SHEET_URL_HERE", // Multipassionate 7
-  "PASTE_SHEET_URL_HERE", // Multipassionate 8
-  "PASTE_SHEET_URL_HERE", // Multipassionate 9
-  "PASTE_SHEET_URL_HERE", // Multipassionate 10
-];
+const LINK_TAB = "sheet_link";  // tab holding member sheet URLs in column B
 
-// Convert any date value from Goog
-// le Sheets to a clean JS Date at midnight
+// Read member sheet URLs from the sheet_link tab (col B, row 2 downward).
+function getMenteeSheets() {
+  const master = SpreadsheetApp.getActiveSpreadsheet();
+  const tab = master.getSheetByName(LINK_TAB);
+  if (!tab) {
+    Logger.log(`"${LINK_TAB}" tab not found — add it with headers Sl_no | link`);
+    return [];
+  }
+  const last = tab.getLastRow();
+  if (last < 2) return [];
+  const urls = tab.getRange(2, 2, last - 1, 1).getValues()  // B2:B<last>
+    .map(r => (r[0] || "").toString().trim())
+    .filter(u => u && u.startsWith("http"));
+  return urls;
+}
+
+// Convert any date value from Google Sheets to a clean JS Date at midnight
 function parseSheetDate(val) {
   if (!val || val === "") return null;
   try {
@@ -50,26 +54,34 @@ function syncScores() {
   const windowStart = new Date(today);
   windowStart.setDate(today.getDate() - 15);
 
-  const needed = MENTEE_SHEETS.length + 4;
-  if (lb.getLastRow() < needed) lb.insertRowsAfter(lb.getLastRow(), needed - lb.getLastRow());
+  const menteeSheets = getMenteeSheets();   // URLs from the sheet_link tab
+  Logger.log(`Found ${menteeSheets.length} member sheet(s) in "${LINK_TAB}"`);
 
-  MENTEE_SHEETS.forEach((url, i) => {
+  // Snapshot existing leaderboard so we can carry PREV SCORE per NAME.
+  // Map: name -> last NOMO score (col 6, index 5).
+  const prevByName = {};
+  const existing = lb.getRange(5, 1, Math.max(menteeSheets.length, 1), 7).getValues();
+  existing.forEach(r => {
+    const nm = (r[1] || "").toString().trim();
+    const sc = r[5];
+    if (nm && sc !== "" && sc !== null) prevByName[nm] = sc;
+  });
+
+  // Compute every active member into an in-memory array. No writes yet —
+  // this avoids the write-by-position vs. sort-by-score race condition.
+  const results = [];
+  menteeSheets.forEach((url, i) => {
     try {
-      if (!url || url === "PASTE_SHEET_URL_HERE") return;
-
-      const row = i + 5;
       const ss = SpreadsheetApp.openByUrl(url);
       const profile = ss.getSheetByName("👤 My Profile");
       const log = ss.getSheetByName("📅 Daily Log");
       if (!profile || !log) return;
 
       // name
-      const name = profile.getRange("D4").getValue();
-      if (name && !name.toString().includes("←") && name.toString().trim() !== "") {
-        lb.getRange(row, 2).setValue(name.toString().trim());
-      }
+      let name = (profile.getRange("D4").getValue() || "").toString().trim();
+      if (!name || name.includes("←")) return;  // skip unfilled profiles
 
-      // read log A4:J93 — cols: A=date, B=day, C=P1, D=yes/no, E=P2, F=yes/no, G=P3, H=yes/no, I=energy, J=win
+      // read log A4:J93 — A=date,B=day,C=P1,D=yes/no,E=P2,F=yes/no,G=P3,H=yes/no,I=energy,J=win
       const logData = log.getRange("A4:J93").getValues();
 
       const window15 = logData.filter(r => {
@@ -81,63 +93,69 @@ function syncScores() {
 
       Logger.log(`${name}: ${window15.length} rows in 15-day window`);
 
-      if (window15.length === 0) {
-        // save prev before zeroing
-        const curr = lb.getRange(row, 6).getValue();
-        if (curr !== "" && curr !== 0) lb.getRange(row, 7).setValue(curr);
-        lb.getRange(row, 3, 1, 4).setValues([[0, 0, 0, 0]]);
-        return;
+      let streak = 0, avgEnergy = 0, wins = 0, total = 0;
+      if (window15.length > 0) {
+        // 1. STREAK — distinct days shown up (at least one Yes in D/F/H)
+        const shownUpDays = new Set();
+        window15.forEach(r => {
+          const yesNo = [r[3], r[5], r[7]].map(v => (v||"").toString().trim().toLowerCase());
+          if (yesNo.includes("yes")) {
+            const d = parseSheetDate(r[0]);
+            if (d) shownUpDays.add(d.toDateString());
+          }
+        });
+        streak = shownUpDays.size;
+        const streakScore = Math.min(streak / 15, 1) * 40;
+
+        // 2. AVG ENERGY (col I = index 8)
+        const energies = window15.map(r => parseInt(r[8])).filter(e => !isNaN(e) && e > 0);
+        avgEnergy = energies.length > 0 ? energies.reduce((a,b) => a+b, 0) / energies.length : 0;
+        const energyScore = (avgEnergy / 5) * 30;
+
+        // 3. WINS (col J = index 9)
+        wins = window15.filter(r => r[9] && r[9].toString().trim() !== "").length;
+        const winsScore = Math.min(wins / 15, 1) * 20;
+
+        // 4. PARTICIPATION 10% — showed up at all
+        const participationScore = Math.min(streak / 15, 1) * 10;
+
+        total = Math.round((streakScore + energyScore + winsScore + participationScore) * 10) / 10;
       }
 
-      // 1. STREAK — distinct days shown up (at least one Yes in D/F/H)
-      const shownUpDays = new Set();
-      window15.forEach(r => {
-        const yesNo = [r[3], r[5], r[7]].map(v => (v||"").toString().trim().toLowerCase());
-        if (yesNo.includes("yes")) {
-          const d = parseSheetDate(r[0]);
-          if (d) shownUpDays.add(d.toDateString());
-        }
+      // PREV SCORE = this member's previous total (by name), only if it changed
+      const prev = prevByName.hasOwnProperty(name) ? prevByName[name] : "";
+      const prevScore = (prev !== "" && prev !== total) ? prev : "";
+
+      results.push({
+        name: name,
+        streak: streak,
+        avgEnergy: Math.round(avgEnergy * 10) / 10,
+        wins: wins,
+        total: total,
+        prevScore: prevScore,
       });
-      const streak = shownUpDays.size;
-      const streakScore = Math.min(streak / 15, 1) * 40;
-
-      // 2. AVG ENERGY (col I = index 8)
-      const energies = window15.map(r => parseInt(r[8])).filter(e => !isNaN(e) && e > 0);
-      const avgEnergy = energies.length > 0 ? energies.reduce((a,b) => a+b, 0) / energies.length : 0;
-      const energyScore = (avgEnergy / 5) * 30;
-
-      // 3. WINS (col J = index 9)
-      const wins = window15.filter(r => r[9] && r[9].toString().trim() !== "").length;
-      const winsScore = Math.min(wins / 15, 1) * 20;
-
-      // 4. MISSING 10% — leave as participation bonus (showed up at all)
-      const participationScore = Math.min(streak / 15, 1) * 10;
-
-      const total = Math.round((streakScore + energyScore + winsScore + participationScore) * 10) / 10;
-
-      // save prev score before overwriting
-      const curr = lb.getRange(row, 6).getValue();
-      if (curr !== "" && curr !== total) lb.getRange(row, 7).setValue(curr);
-
-      // write: col3=streak, col4=avgEnergy, col5=wins, col6=nomoScore, col7=prevScore(already set above)
-      lb.getRange(row, 3).setValue(streak);
-      lb.getRange(row, 4).setValue(Math.round(avgEnergy * 10) / 10);
-      lb.getRange(row, 5).setValue(wins);
-      lb.getRange(row, 6).setValue(total);
 
     } catch(e) {
       Logger.log(`Multipassionate ${i+1} error: ${e.message}`);
     }
   });
 
-  // sort by NOMO score desc, then rank
-  const range = lb.getRange(5, 1, MENTEE_SHEETS.length, 7);
-  const data = range.getValues();
-  data.sort((a, b) => (b[5]||0) - (a[5]||0));
-  data.forEach((row, i) => row[0] = i + 1);
-  range.setValues(data);
+  // Sort by score desc, assign rank, build the full block.
+  results.sort((a, b) => b.total - a.total);
 
-  Logger.log("NOMO synced at " + new Date());
+  // Clear the old data block first (so removed/duplicate members don't linger).
+  // Clear generously (member count or 50 rows) so stale rows never survive.
+  const blockRows = Math.max(menteeSheets.length, results.length, 50);
+  lb.getRange(5, 1, blockRows, 7).clearContent();
+
+  if (results.length > 0) {
+    const out = results.map((m, idx) => [
+      idx + 1, m.name, m.streak, m.avgEnergy, m.wins, m.total, m.prevScore,
+    ]);
+    lb.getRange(5, 1, out.length, 7).setValues(out);
+  }
+
+  Logger.log(`NOMO synced ${results.length} member(s) at ` + new Date());
 }
 
 // ─────────────────────────────────────────────────────────
