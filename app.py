@@ -183,6 +183,33 @@ def medal(r):
 SCOPES = ["https://spreadsheets.google.com/feeds",
           "https://www.googleapis.com/auth/drive"]
 
+# Top_Achievers layout: row 1 banner, row 2 subtitle, row 3 blank,
+# row 4 = column headers, row 5+ = data.
+HEADER_ROW = 4
+
+def _read_leaderboard(ws):
+    """Build a DataFrame from the Top_Achievers tab, accounting for the
+    styled banner rows above the real header (row 4). Skips empty member
+    slots — only members who have actually been scored are kept."""
+    rows = ws.get_all_values()              # list of lists, all cells as strings
+    if len(rows) < HEADER_ROW:
+        return pd.DataFrame()
+    headers = [h for h in rows[HEADER_ROW - 1] if h.strip()]
+    ncol = len(headers)
+    # locate NAME and NOMO SCORE columns
+    name_i = next((i for i, h in enumerate(headers) if "NAME" in h.upper()), 1)
+    score_i = next((i for i, h in enumerate(headers)
+                    if "NOMO" in h.upper() and "SCORE" in h.upper()), None)
+    data = []
+    for r in rows[HEADER_ROW:]:             # data starts the row after headers
+        cells = (r + [""] * ncol)[:ncol]    # pad/trim to header width
+        if not cells[name_i].strip():       # no NAME → empty slot
+            continue
+        if score_i is not None and not cells[score_i].strip():
+            continue                        # placeholder member, not yet scored
+        data.append(cells)
+    return pd.DataFrame(data, columns=headers)
+
 @st.cache_data(ttl=300)
 def load_sheet(url, creds_json):
     """Connect using a service-account JSON string (sidebar path)."""
@@ -190,7 +217,7 @@ def load_sheet(url, creds_json):
         c = Credentials.from_service_account_info(json.loads(creds_json), scopes=SCOPES)
         gc = gspread.authorize(c)
         ws = gc.open_by_url(url).worksheet("🏆 Top_Achievers")
-        return pd.DataFrame(ws.get_all_records()), None
+        return _read_leaderboard(ws), None
     except Exception as e:
         return None, str(e)
 
@@ -203,7 +230,7 @@ def load_sheet_from_secrets():
         c = Credentials.from_service_account_info(sa, scopes=SCOPES)
         gc = gspread.authorize(c)
         ws = gc.open_by_url(url).worksheet("🏆 Top_Achievers")
-        return pd.DataFrame(ws.get_all_records()), None
+        return _read_leaderboard(ws), None
     except Exception as e:
         return None, str(e)
 
@@ -264,12 +291,12 @@ using_sample = False
 if has_secrets():
     # Cloud path: auto-connect to the configured leaderboard
     df, err = load_sheet_from_secrets()
-    if err: st.sidebar.error(err)
+    if err: st.error(f"Could not load live leaderboard: {err}")
 elif url and creds:
     # Manual path: credentials pasted in the sidebar
     df, err = load_sheet(url, creds)
     if err: st.sidebar.error(err)
-if df is None:
+if df is None or df.empty:
     df = sample(); using_sample = True
 
 sc = next((c for c in df.columns if "NOMO" in c.upper() and "SCORE" in c.upper()), None)
