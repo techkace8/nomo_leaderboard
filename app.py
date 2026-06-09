@@ -315,16 +315,19 @@ with c1:
 with c3:
     st.markdown(f'<div class="nomo-updated">{datetime.now().strftime("%d %b %Y · %H:%M")}</div>', unsafe_allow_html=True)
 
-# ── refresh button (60s cooldown) ─────────────────────────
+# ── refresh button (anti-spam guard, no background polling) ──
+# After a refresh: sync once, reload data once, then the page stays static.
+# The button greys out for COOLDOWN_SECONDS and re-enables on the next
+# interaction — there is no per-second rerun loop.
 with c2:
     last = st.session_state.get("last_refresh", 0.0)
-    remaining = int(COOLDOWN_SECONDS - (time.time() - last))
+    cooling = (time.time() - last) < COOLDOWN_SECONDS
     if not REFRESH_URL:
         st.button("↻ REFRESH", disabled=True, use_container_width=True,
                   help="Set REFRESH_URL in secrets to enable live refresh")
-    elif remaining > 0:
-        st.button(f"↻ 0:{remaining:02d}", disabled=True, use_container_width=True,
-                  help="Cooling down to avoid spamming the sync")
+    elif cooling:
+        st.button("↻ UPDATED", disabled=True, use_container_width=True,
+                  help="Just refreshed — wait a moment before syncing again")
     else:
         if st.button("↻ REFRESH", use_container_width=True,
                      help="Recompute the leaderboard from everyone's latest logs"):
@@ -332,7 +335,7 @@ with c2:
                 ok, msg = trigger_sync()
             st.session_state["last_refresh"] = time.time()
             if ok:
-                # bust caches so the freshly-synced data loads
+                # bust caches so the freshly-synced data loads once
                 load_sheet.clear()
                 load_sheet_from_secrets.clear()
                 st.rerun()
@@ -340,11 +343,6 @@ with c2:
                 st.toast(f"Refresh failed: {msg}", icon="⚠️")
 
 st.markdown('<hr class="nomo-divider">', unsafe_allow_html=True)
-
-# Auto-rerun once per second while cooling down, so the countdown ticks live
-if REFRESH_URL and 0 < int(COOLDOWN_SECONDS - (time.time() - st.session_state.get("last_refresh", 0.0))):
-    time.sleep(1)
-    st.rerun()
 
 if using_sample:
     st.markdown('<div class="info-bar">Sample data — connect your Top_Achievers sheet in the sidebar to go live</div>', unsafe_allow_html=True)
