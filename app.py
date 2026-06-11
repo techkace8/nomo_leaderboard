@@ -345,6 +345,11 @@ with c2:
                      help="Recompute the leaderboard from everyone's latest logs"):
             with st.spinner("Syncing leaderboard…"):
                 ok, msg = trigger_sync()
+                # The Web App can return its HTTP response before syncScores()
+                # finishes committing rows to the sheet. Give the write a moment
+                # to settle so we don't re-read a half-written (stale) board.
+                if ok:
+                    time.sleep(4)
             st.session_state["last_refresh"] = time.time()
             if ok:
                 # bust caches so the freshly-synced data loads once
