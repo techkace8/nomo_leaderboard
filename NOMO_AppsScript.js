@@ -57,14 +57,34 @@ function syncScores() {
   const menteeSheets = getMenteeSheets();   // URLs from the sheet_link tab
   Logger.log(`Found ${menteeSheets.length} member sheet(s) in "${LINK_TAB}"`);
 
-  // Snapshot existing leaderboard so we can carry PREV SCORE per NAME.
-  // Map: name -> last NOMO score (col 6, index 5).
-  const prevByName = {};
+  // ── DAILY BASELINE for the change arrow ───────────────────────────────
+  // The arrow (▲/▼) must be the SAME for every viewer all day, no matter who
+  // refreshes or how often. So PREV SCORE is a "yesterday's closing" baseline
+  // that only advances ONCE per calendar day — the first sync of a new day.
+  // Manual refreshes recompute live scores but never move the baseline.
+  //
+  // Read the existing board: col 6 (idx 5) = current NOMO, col 7 (idx 6) = PREV.
+  const props = PropertiesService.getScriptProperties();
+  const todayKey = Utilities.formatDate(today, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  const lastBaselineDate = props.getProperty("lastBaselineDate");
+  const newDay = (lastBaselineDate !== todayKey);
+
   const existing = lb.getRange(5, 1, Math.max(menteeSheets.length, 1), 7).getValues();
+
+  // baselineByName = the PREV SCORE every viewer should see today.
+  // - New day: snapshot each member's CURRENT score now → becomes today's baseline.
+  // - Same day: reuse the PREV already on the board (don't move it).
+  const baselineByName = {};
   existing.forEach(r => {
     const nm = (r[1] || "").toString().trim();
-    const sc = r[5];
-    if (nm && sc !== "" && sc !== null) prevByName[nm] = sc;
+    if (!nm) return;
+    const curr = r[5];   // current NOMO score
+    const prev = r[6];   // existing PREV (today's baseline, if already set)
+    if (newDay) {
+      if (curr !== "" && curr !== null) baselineByName[nm] = curr;
+    } else {
+      if (prev !== "" && prev !== null) baselineByName[nm] = prev;
+    }
   });
 
   // Compute every active member into an in-memory array. No writes yet —
@@ -122,9 +142,10 @@ function syncScores() {
         total = Math.round((streakScore + energyScore + winsScore + participationScore) * 10) / 10;
       }
 
-      // PREV SCORE = this member's previous total (by name), only if it changed
-      const prev = prevByName.hasOwnProperty(name) ? prevByName[name] : "";
-      const prevScore = (prev !== "" && prev !== total) ? prev : "";
+      // PREV SCORE = today's daily baseline for this member (same for everyone,
+      // all day). Blank only if there is no baseline yet (brand-new member).
+      const base = baselineByName.hasOwnProperty(name) ? baselineByName[name] : "";
+      const prevScore = (base !== "" && base !== total) ? base : "";
 
       results.push({
         name: name,
@@ -168,6 +189,12 @@ function syncScores() {
       idx + 1, m.name, m.streak, m.avgEnergy, m.wins, m.total, m.prevScore,
     ]);
     lb.getRange(5, 1, out.length, 7).setValues(out);
+  }
+
+  // Mark today's baseline as set, so further syncs today won't move PREV.
+  if (newDay) {
+    props.setProperty("lastBaselineDate", todayKey);
+    Logger.log(`New-day baseline captured for ${todayKey}`);
   }
 
   Logger.log(`NOMO synced ${deduped.length} member(s) at ` + new Date());
