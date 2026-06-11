@@ -41,7 +41,7 @@ button[kind="header"]{display:none!important}
 .nomo-title{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:900;color:#111;letter-spacing:-.03em;line-height:1}
 .nomo-title em{font-style:italic;color:#1a6b4a}
 .nomo-tag{font-size:10px;color:#aaa;letter-spacing:.14em;text-transform:uppercase;font-family:monospace;margin-top:8px}
-.nomo-updated{font-size:11px;color:#aaa;font-family:monospace;text-align:right;padding-top:20px}
+.nomo-updated{font-size:11px;color:#aaa;font-family:monospace;text-align:left;padding-top:10px}
 .nomo-divider{border:none;border-top:2px solid #111;margin:20px 0 32px}
 
 /* INFO BAR */
@@ -130,26 +130,39 @@ div[data-testid="stButton"] > button:disabled{
 }
 div[data-testid="stButton"] > button:focus{box-shadow:none!important;outline:none!important}
 
+.lb-denom{font-size:11px;color:#aaa;font-weight:400;white-space:nowrap}
+
 @media(max-width:768px){
-  .block-container{padding:1.5rem 1.2rem 3rem!important}
-  .nomo-title{font-size:1.6rem!important}
+  .block-container{padding:1.4rem 1rem 3rem!important}
+  .nomo-title{font-size:1.7rem!important;line-height:1.1}
+  .nomo-tag{font-size:9px!important}
+  .nomo-updated{font-size:10px!important;text-align:left!important;padding-top:10px!important}
+  .nomo-divider{margin:14px 0 22px!important}
+
+  /* metrics: 2x2 grid */
   .metric-grid{grid-template-columns:repeat(2,1fr)!important}
+  .metric-cell{padding:16px 14px!important}
+  .metric-val{font-size:2rem!important}
   .metric-cell:nth-child(2){border-right:none!important}
   .metric-cell:nth-child(3){border-top:2px solid #111!important}
   .metric-cell:nth-child(4){border-top:2px solid #111!important;border-right:none!important}
-  .lb-row{flex-wrap:wrap;gap:8px;padding:12px 14px}
-  .lb-name{width:80px!important;font-size:13px!important}
-  .lb-score{font-size:1.1rem!important;width:52px!important}
-  .lb-bar-bg{width:100%!important;order:5;flex-basis:100%}
-  .lb-badge{font-size:8px!important}
-  .lb-chg{width:30px!important}
+
+  /* leaderboard: name+score+badge on row 1, full-width bar on row 2 */
+  .lb-row{flex-wrap:wrap;gap:7px 10px;padding:13px 14px}
+  .lb-rank{font-size:1rem!important;width:24px!important}
+  .lb-name{flex:1!important;width:auto!important;font-size:14px!important;min-width:0}
+  .lb-score{font-size:1.25rem!important;width:auto!important;flex-shrink:0}
+  .lb-denom{font-size:10px!important}
+  .lb-chg{width:auto!important;flex-shrink:0;min-width:34px}
+  .lb-badge{font-size:8px!important;padding:3px 7px!important;flex-shrink:0}
+  .lb-bar-bg{width:100%!important;order:9;flex-basis:100%;height:6px!important}
+
   .wt-row{flex-wrap:wrap}
   .wt-pill{flex-basis:33%!important;border-bottom:1.5px solid #111}
   .band-row{flex-wrap:wrap}
   .band-pill{flex-basis:33%!important;border-bottom:1.5px solid #111}
   .bd-table{font-size:11px!important}
   .bd-table th,.bd-table td{padding:7px 8px!important}
-  .nomo-updated{font-size:10px!important;padding-top:8px!important}
 }
 </style>
 """, unsafe_allow_html=True)
@@ -308,11 +321,10 @@ if sc:
     df["RANK"] = df.index + 1
 
 # ── header ────────────────────────────────────────────────
-c1, c2, c3 = st.columns([3, 1, 1])
+c1, c2 = st.columns([3, 1], vertical_alignment="center")
 with c1:
     st.markdown('<div class="nomo-title">NOMO — <em>Top Achievers</em></div>', unsafe_allow_html=True)
     st.markdown('<div class="nomo-tag">15-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
-with c3:
     st.markdown(f'<div class="nomo-updated">{datetime.now().strftime("%d %b %Y · %H:%M")}</div>', unsafe_allow_html=True)
 
 # ── refresh button (anti-spam guard, no background polling) ──
