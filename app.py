@@ -207,6 +207,12 @@ def _read_leaderboard(ws):
     rows = ws.get_all_values()              # list of lists, all cells as strings
     if len(rows) < HEADER_ROW:
         return pd.DataFrame()
+    # H3 (row 3, col 8) holds "Synced: … IST" written by the Apps Script —
+    # the same data-freshness stamp for every viewer. (Rows 1-2 are merged
+    # banner cells, so H3 is the first free cell.) Stash it on the frame.
+    synced = ""
+    if len(rows) >= 3 and len(rows[2]) >= 8:
+        synced = rows[2][7].strip()
     headers = [h for h in rows[HEADER_ROW - 1] if h.strip()]
     ncol = len(headers)
     # locate NAME and NOMO SCORE columns
@@ -221,7 +227,9 @@ def _read_leaderboard(ws):
         if score_i is not None and not cells[score_i].strip():
             continue                        # placeholder member, not yet scored
         data.append(cells)
-    return pd.DataFrame(data, columns=headers)
+    df = pd.DataFrame(data, columns=headers)
+    df.attrs["synced"] = synced
+    return df
 
 @st.cache_data(ttl=300)
 def load_sheet(url, creds_json):
@@ -325,7 +333,9 @@ c1, c2 = st.columns([3, 1], vertical_alignment="center")
 with c1:
     st.markdown('<div class="nomo-title">NOMO — <em>Top Achievers</em></div>', unsafe_allow_html=True)
     st.markdown('<div class="nomo-tag">15-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="nomo-updated">{datetime.now().strftime("%d %b %Y · %H:%M")}</div>', unsafe_allow_html=True)
+    synced = df.attrs.get("synced", "") if df is not None else ""
+    stamp = synced if synced else "Sample data"
+    st.markdown(f'<div class="nomo-updated">{stamp}</div>', unsafe_allow_html=True)
 
 # ── refresh button (anti-spam guard, no background polling) ──
 # After a refresh: sync once, reload data once, then the page stays static.

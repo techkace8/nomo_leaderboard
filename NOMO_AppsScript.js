@@ -191,6 +191,12 @@ function syncScores() {
     lb.getRange(5, 1, out.length, 7).setValues(out);
   }
 
+  // Stamp the sync time (IST) into H3 so the web app shows "data as of …"
+  // identically for every viewer — not each viewer's own page-load time.
+  // (Row 1/2 are merged banner cells, so H3 is the first free cell.)
+  const stamp = Utilities.formatDate(new Date(), "Asia/Kolkata", "dd MMM yyyy · HH:mm");
+  lb.getRange("H3").setValue("Synced: " + stamp + " IST");
+
   // Mark today's baseline as set, so further syncs today won't move PREV.
   if (newDay) {
     props.setProperty("lastBaselineDate", todayKey);
@@ -209,7 +215,7 @@ function syncScores() {
 // Copy the Web App URL into app.py (REFRESH_URL).
 //
 // Optional shared secret: set SCRIPT_TOKEN below and pass ?token=... in the
-// request so random visitors can't trigger your sync. Leave "" to disable. 
+// request so random visitors can't trigger your sync. Leave "" to disable.PASTE_YOUR_SECRET_TOKEN_HERE  
 // ─────────────────────────────────────────────────────────
 const SCRIPT_TOKEN = "PASTE_YOUR_SECRET_TOKEN_HERE"; // must match SCRIPT_TOKEN in Streamlit secrets — keep the real value out of public code
 
