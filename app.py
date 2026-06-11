@@ -39,7 +39,7 @@ button[kind="header"]{display:none!important}
 
 /* HEADER */
 .nomo-title{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:900;color:#111;letter-spacing:-.03em;line-height:1}
-.nomo-title em{font-style:italic;color:#1a6b4a}
+.nomo-title em{font-style:normal;text-transform:uppercase;color:#1a6b4a;letter-spacing:.01em}
 .nomo-tag{font-size:10px;color:#aaa;letter-spacing:.14em;text-transform:uppercase;font-family:monospace;margin-top:8px}
 .nomo-updated{font-size:11px;color:#aaa;font-family:monospace;text-align:left;padding-top:10px}
 .nomo-divider{border:none;border-top:2px solid #111;margin:20px 0 32px}
@@ -136,8 +136,11 @@ div[data-testid="stButton"] > button:focus{box-shadow:none!important;outline:non
   .block-container{padding:1.4rem 1rem 3rem!important}
   .nomo-title{font-size:1.7rem!important;line-height:1.1}
   .nomo-tag{font-size:9px!important}
-  .nomo-updated{font-size:10px!important;text-align:left!important;padding-top:10px!important}
-  .nomo-divider{margin:14px 0 22px!important}
+  .nomo-updated{font-size:10px!important;text-align:left!important;padding-top:6px!important}
+  .nomo-divider{margin:10px 0 18px!important}
+  /* tighten the stacked refresh button so it doesn't leave a tall gap */
+  div[data-testid="stButton"] > button{margin-top:8px!important;padding:7px 4px!important}
+  div[data-testid="stHorizontalBlock"]{gap:.4rem!important}
 
   /* metrics: 2x2 grid */
   .metric-grid{grid-template-columns:repeat(2,1fr)!important}
