@@ -140,22 +140,37 @@ function syncScores() {
     }
   });
 
+  // Safety guard: collapse any same-name members to a single row (keep the
+  // higher score). Clean data shouldn't trigger this, but a stray D4 typo or a
+  // duplicate URL must never put two identical names on the board again.
+  const byName = {};
+  results.forEach(m => {
+    const key = m.name.toLowerCase();
+    if (!byName[key] || m.total > byName[key].total) {
+      if (byName[key]) Logger.log(`Duplicate name "${m.name}" — keeping higher score`);
+      byName[key] = m;
+    } else {
+      Logger.log(`Duplicate name "${m.name}" — dropping lower score`);
+    }
+  });
+  const deduped = Object.keys(byName).map(k => byName[k]);
+
   // Sort by score desc, assign rank, build the full block.
-  results.sort((a, b) => b.total - a.total);
+  deduped.sort((a, b) => b.total - a.total);
 
   // Clear the old data block first (so removed/duplicate members don't linger).
   // Clear generously (member count or 50 rows) so stale rows never survive.
-  const blockRows = Math.max(menteeSheets.length, results.length, 50);
+  const blockRows = Math.max(menteeSheets.length, deduped.length, 50);
   lb.getRange(5, 1, blockRows, 7).clearContent();
 
-  if (results.length > 0) {
-    const out = results.map((m, idx) => [
+  if (deduped.length > 0) {
+    const out = deduped.map((m, idx) => [
       idx + 1, m.name, m.streak, m.avgEnergy, m.wins, m.total, m.prevScore,
     ]);
     lb.getRange(5, 1, out.length, 7).setValues(out);
   }
 
-  Logger.log(`NOMO synced ${results.length} member(s) at ` + new Date());
+  Logger.log(`NOMO synced ${deduped.length} member(s) at ` + new Date());
 }
 
 // ─────────────────────────────────────────────────────────
@@ -167,7 +182,7 @@ function syncScores() {
 // Copy the Web App URL into app.py (REFRESH_URL).
 //
 // Optional shared secret: set SCRIPT_TOKEN below and pass ?token=... in the
-// request so random visitors can't trigger your sync. Leave "" to disable.
+// request so random visitors can't trigger your sync. Leave "" to disable. 
 // ─────────────────────────────────────────────────────────
 const SCRIPT_TOKEN = "PASTE_YOUR_SECRET_TOKEN_HERE"; // must match SCRIPT_TOKEN in Streamlit secrets — keep the real value out of public code
 
