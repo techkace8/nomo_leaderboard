@@ -52,7 +52,7 @@ button[kind="header"]{display:none!important}
 .metric-cell{padding:20px 22px;border-right:2px solid #111}
 .metric-cell:last-child{border-right:none}
 .metric-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#aaa;font-family:monospace;margin-bottom:8px}
-.metric-val{font-family:'Outfit',sans-serif;font-size:2.4rem;font-weight:700;color:#111;line-height:1}
+.metric-val{font-family:'DM Serif Display',serif;font-size:2.4rem;font-weight:700;color:#111;line-height:1}
 .metric-sub{font-size:11px;color:#aaa;margin-top:4px}
 
 /* SECTION TITLE */
@@ -62,11 +62,11 @@ button[kind="header"]{display:none!important}
 .lb-row{display:flex;align-items:center;gap:16px;padding:16px 20px;background:#fff;border:1.5px solid #111;margin-bottom:-1.5px}
 .lb-row:first-child{border-radius:10px 10px 0 0}
 .lb-row:last-child{border-radius:0 0 10px 10px;margin-bottom:0}
-.lb-rank{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;width:28px;text-align:center;flex-shrink:0;color:#111}
+.lb-rank{font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:700;width:28px;text-align:center;flex-shrink:0;color:#111}
 .lb-name{font-size:14px;font-weight:600;color:#111;width:110px;flex-shrink:0;letter-spacing:-.01em}
 .lb-bar-bg{flex:1;height:5px;background:#f0f0ee;border-radius:0}
 .lb-bar{height:100%;border-radius:0}
-.lb-score{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:700;color:#111;width:68px;text-align:right;flex-shrink:0;line-height:1}
+.lb-score{font-family:'DM Serif Display',serif;font-size:1.4rem;font-weight:700;color:#111;width:68px;text-align:right;flex-shrink:0;line-height:1}
 .lb-denom{font-size:11px;color:#aaa;font-weight:400}
 .lb-chg{font-size:11px;font-family:monospace;width:40px;text-align:center;flex-shrink:0}
 .up{color:#1a6b4a;font-weight:600}.dn{color:#c13a3a;font-weight:600}.eq{color:#aaa}
@@ -83,7 +83,7 @@ button[kind="header"]{display:none!important}
 .bd-table td{padding:11px 12px;border-bottom:1px solid #eee;color:#111;font-size:13px}
 .bd-table tr:last-child td{border-bottom:none}
 .bd-table tr:hover td{background:#fafaf8}
-.td-score{font-weight:700;color:#1a6b4a;font-family:'Outfit',sans-serif;font-size:15px}
+.td-score{font-weight:700;color:#1a6b4a;font-family:'DM Serif Display',serif;font-size:15px}
 .td-m{color:#888}
 
 /* WEIGHTS */
