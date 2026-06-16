@@ -382,8 +382,8 @@ top_name = df[nc].iloc[0] if len(df) > 0 else "—"
 
 st.markdown(f"""
 <div class="metric-grid">
-  <div class="metric-cell"><div class="metric-lbl">Multipassionates</div><div class="metric-val">{total}</div><div class="metric-sub">in cohort</div></div>
-  <div class="metric-cell"><div class="metric-lbl">Cohort avg</div><div class="metric-val">{avg}</div><div class="metric-sub">out of 100</div></div>
+  <div class="metric-cell"><div class="metric-lbl">Multipassionates</div><div class="metric-val">{total}</div><div class="metric-sub">in Total</div></div>
+  <div class="metric-cell"><div class="metric-lbl">Avg score</div><div class="metric-val">{avg}</div><div class="metric-sub">out of 100</div></div>
   <div class="metric-cell"><div class="metric-lbl">Top score</div><div class="metric-val">{top}</div><div class="metric-sub">{top_name}</div></div>
   <div class="metric-cell"><div class="metric-lbl">Window</div><div class="metric-val">15</div><div class="metric-sub">rolling days</div></div>
 </div>
