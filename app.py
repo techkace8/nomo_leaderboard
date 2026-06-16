@@ -23,7 +23,7 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 html,body,[class*="css"]{font-family:'Inter',sans-serif!important;background:#ffffff!important}
 [data-testid="stAppViewContainer"],[data-testid="stMain"],[data-testid="block-container"]{background:#ffffff!important}
@@ -38,7 +38,7 @@ button[kind="header"]{display:none!important}
 [data-testid="baseButton-header"]{display:none!important}
 
 /* HEADER */
-.nomo-title{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:900;color:#111;letter-spacing:-.03em;line-height:1}
+.nomo-title{font-family:'DM Serif Display',serif;font-size:2.6rem;font-weight:900;color:#111;letter-spacing:-.03em;line-height:1}
 .nomo-title em{font-style:normal;text-transform:uppercase;color:#1a6b4a;letter-spacing:.01em}
 .nomo-tag{font-size:10px;color:#aaa;letter-spacing:.14em;text-transform:uppercase;font-family:monospace;margin-top:8px}
 .nomo-updated{font-size:11px;color:#aaa;font-family:monospace;text-align:left;padding-top:10px}
@@ -52,7 +52,7 @@ button[kind="header"]{display:none!important}
 .metric-cell{padding:20px 22px;border-right:2px solid #111}
 .metric-cell:last-child{border-right:none}
 .metric-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#aaa;font-family:monospace;margin-bottom:8px}
-.metric-val{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:#111;line-height:1}
+.metric-val{font-family:'Outfit',sans-serif;font-size:2.4rem;font-weight:700;color:#111;line-height:1}
 .metric-sub{font-size:11px;color:#aaa;margin-top:4px}
 
 /* SECTION TITLE */
@@ -62,11 +62,11 @@ button[kind="header"]{display:none!important}
 .lb-row{display:flex;align-items:center;gap:16px;padding:16px 20px;background:#fff;border:1.5px solid #111;margin-bottom:-1.5px}
 .lb-row:first-child{border-radius:10px 10px 0 0}
 .lb-row:last-child{border-radius:0 0 10px 10px;margin-bottom:0}
-.lb-rank{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;width:28px;text-align:center;flex-shrink:0;color:#111}
+.lb-rank{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;width:28px;text-align:center;flex-shrink:0;color:#111}
 .lb-name{font-size:14px;font-weight:600;color:#111;width:110px;flex-shrink:0;letter-spacing:-.01em}
 .lb-bar-bg{flex:1;height:5px;background:#f0f0ee;border-radius:0}
 .lb-bar{height:100%;border-radius:0}
-.lb-score{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:#111;width:68px;text-align:right;flex-shrink:0;line-height:1}
+.lb-score{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:700;color:#111;width:68px;text-align:right;flex-shrink:0;line-height:1}
 .lb-denom{font-size:11px;color:#aaa;font-weight:400}
 .lb-chg{font-size:11px;font-family:monospace;width:40px;text-align:center;flex-shrink:0}
 .up{color:#1a6b4a;font-weight:600}.dn{color:#c13a3a;font-weight:600}.eq{color:#aaa}
@@ -83,7 +83,7 @@ button[kind="header"]{display:none!important}
 .bd-table td{padding:11px 12px;border-bottom:1px solid #eee;color:#111;font-size:13px}
 .bd-table tr:last-child td{border-bottom:none}
 .bd-table tr:hover td{background:#fafaf8}
-.td-score{font-weight:700;color:#1a6b4a;font-family:'Playfair Display',serif;font-size:15px}
+.td-score{font-weight:700;color:#1a6b4a;font-family:'Outfit',sans-serif;font-size:15px}
 .td-m{color:#888}
 
 /* WEIGHTS */
