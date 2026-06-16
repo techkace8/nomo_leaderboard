@@ -138,9 +138,10 @@ div[data-testid="stButton"] > button:focus{box-shadow:none!important;outline:non
   .nomo-tag{font-size:9px!important}
   .nomo-updated{font-size:10px!important;text-align:left!important;padding-top:6px!important}
   .nomo-divider{margin:10px 0 18px!important}
-  /* tighten the stacked refresh button so it doesn't leave a tall gap */
-  div[data-testid="stButton"] > button{margin-top:8px!important;padding:7px 4px!important}
-  div[data-testid="stHorizontalBlock"]{gap:.4rem!important}
+  /* stack columns vertically on mobile */
+  div[data-testid="stHorizontalBlock"]{flex-direction:column!important;gap:.5rem!important}
+  div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"]{width:100%!important;min-width:100%!important}
+  div[data-testid="stButton"] > button{margin-top:4px!important;padding:8px 4px!important;font-size:11px!important}
 
   /* metrics: 2x2 grid */
   .metric-grid{grid-template-columns:repeat(2,1fr)!important}
@@ -332,21 +333,17 @@ if sc:
     df["RANK"] = df.index + 1
 
 # ── header ────────────────────────────────────────────────
+synced = df.attrs.get("synced", "") if df is not None else ""
+stamp = synced if synced else "Sample data"
+last = st.session_state.get("last_refresh", 0.0)
+cooling = (time.time() - last) < COOLDOWN_SECONDS
+
 c1, c2 = st.columns([3, 1], vertical_alignment="center")
 with c1:
     st.markdown('<div class="nomo-title">NOMO — <em>Top Achievers</em></div>', unsafe_allow_html=True)
     st.markdown('<div class="nomo-tag">15-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
-    synced = df.attrs.get("synced", "") if df is not None else ""
-    stamp = synced if synced else "Sample data"
     st.markdown(f'<div class="nomo-updated">{stamp}</div>', unsafe_allow_html=True)
-
-# ── refresh button (anti-spam guard, no background polling) ──
-# After a refresh: sync once, reload data once, then the page stays static.
-# The button greys out for COOLDOWN_SECONDS and re-enables on the next
-# interaction — there is no per-second rerun loop.
 with c2:
-    last = st.session_state.get("last_refresh", 0.0)
-    cooling = (time.time() - last) < COOLDOWN_SECONDS
     if not REFRESH_URL:
         st.button("↻ REFRESH", disabled=True, use_container_width=True,
                   help="Set REFRESH_URL in secrets to enable live refresh")
@@ -358,14 +355,10 @@ with c2:
                      help="Recompute the leaderboard from everyone's latest logs"):
             with st.spinner("Syncing leaderboard…"):
                 ok, msg = trigger_sync()
-                # The Web App can return its HTTP response before syncScores()
-                # finishes committing rows to the sheet. Give the write a moment
-                # to settle so we don't re-read a half-written (stale) board.
                 if ok:
                     time.sleep(4)
             st.session_state["last_refresh"] = time.time()
             if ok:
-                # bust caches so the freshly-synced data loads once
                 load_sheet.clear()
                 load_sheet_from_secrets.clear()
                 st.rerun()
