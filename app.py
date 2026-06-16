@@ -98,6 +98,12 @@ button[kind="header"]{display:none!important}
 
 [data-testid="stSidebar"]{background:#fafaf8!important}
 
+/* REFRESH BUTTON wrap — floats right on desktop, full-width below title on mobile */
+.refresh-btn-wrap{margin-bottom:6px}
+@media(min-width:769px){
+  .refresh-btn-wrap{position:absolute;top:1.2rem;right:2rem;width:160px}
+}
+
 /* REFRESH BUTTON — outlined pill matching the editorial design */
 div[data-testid="stButton"] > button{
   background:#fff!important;
@@ -138,9 +144,6 @@ div[data-testid="stButton"] > button:focus{box-shadow:none!important;outline:non
   .nomo-tag{font-size:9px!important}
   .nomo-updated{font-size:10px!important;text-align:left!important;padding-top:6px!important}
   .nomo-divider{margin:10px 0 18px!important}
-  /* stack columns vertically on mobile */
-  div[data-testid="stHorizontalBlock"]{flex-direction:column!important;gap:.5rem!important}
-  div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"]{width:100%!important;min-width:100%!important}
   div[data-testid="stButton"] > button{margin-top:4px!important;padding:8px 4px!important;font-size:11px!important}
 
   /* metrics: 2x2 grid */
@@ -338,32 +341,33 @@ stamp = synced if synced else "Sample data"
 last = st.session_state.get("last_refresh", 0.0)
 cooling = (time.time() - last) < COOLDOWN_SECONDS
 
-c1, c2 = st.columns([3, 1], vertical_alignment="center")
-with c1:
-    st.markdown('<div class="nomo-title">NOMO — <em>Top Achievers</em></div>', unsafe_allow_html=True)
-    st.markdown('<div class="nomo-tag">15-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="nomo-updated">{stamp}</div>', unsafe_allow_html=True)
-with c2:
-    if not REFRESH_URL:
-        st.button("↻ REFRESH", disabled=True, use_container_width=True,
-                  help="Set REFRESH_URL in secrets to enable live refresh")
-    elif cooling:
-        st.button("↻ UPDATED", disabled=True, use_container_width=True,
-                  help="Just refreshed — wait a moment before syncing again")
-    else:
-        if st.button("↻ REFRESH", use_container_width=True,
-                     help="Recompute the leaderboard from everyone's latest logs"):
-            with st.spinner("Syncing leaderboard…"):
-                ok, msg = trigger_sync()
-                if ok:
-                    time.sleep(4)
-            st.session_state["last_refresh"] = time.time()
+st.markdown('<div class="nomo-title">NOMO — <em>Top Achievers</em></div>', unsafe_allow_html=True)
+st.markdown('<div class="nomo-tag">15-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
+st.markdown(f'<div class="nomo-updated">{stamp}</div>', unsafe_allow_html=True)
+
+# Refresh button — full width on mobile, right-aligned pill on desktop via CSS
+st.markdown('<div class="refresh-btn-wrap">', unsafe_allow_html=True)
+if not REFRESH_URL:
+    st.button("↻ REFRESH", disabled=True, use_container_width=True,
+              help="Set REFRESH_URL in secrets to enable live refresh")
+elif cooling:
+    st.button("↻ UPDATED", disabled=True, use_container_width=True,
+              help="Just refreshed — wait a moment before syncing again")
+else:
+    if st.button("↻ REFRESH", use_container_width=True,
+                 help="Recompute the leaderboard from everyone's latest logs"):
+        with st.spinner("Syncing leaderboard…"):
+            ok, msg = trigger_sync()
             if ok:
-                load_sheet.clear()
-                load_sheet_from_secrets.clear()
-                st.rerun()
-            else:
-                st.toast(f"Refresh failed: {msg}", icon="⚠️")
+                time.sleep(4)
+        st.session_state["last_refresh"] = time.time()
+        if ok:
+            load_sheet.clear()
+            load_sheet_from_secrets.clear()
+            st.rerun()
+        else:
+            st.toast(f"Refresh failed: {msg}", icon="⚠️")
+st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('<hr class="nomo-divider">', unsafe_allow_html=True)
 
