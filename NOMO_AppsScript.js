@@ -321,7 +321,7 @@ https://nomo-leaderboard.streamlit.app/
 
 Start logging from today (${dateStr}). Fill in "YES/NO", your energy (1-5), and "Today's Win" every day.
 
-Your scores update on the leaderboard every hour.
+Hit the Refresh button on the leaderboard anytime to see your latest score.
 
 Let's go! 🚀
 
