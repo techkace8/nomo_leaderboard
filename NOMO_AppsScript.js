@@ -101,8 +101,8 @@ function syncScores() {
       let name = (profile.getRange("D4").getValue() || "").toString().trim();
       if (!name || name.includes("←")) return;  // skip unfilled profiles
 
-      // read log A4:J93 — A=date,B=day,C=P1,D=yes/no,E=P2,F=yes/no,G=P3,H=yes/no,I=energy,J=win
-      const logData = log.getRange("A4:J93").getValues();
+      // read log A4:J38 — A=date,B=day,C=P1,D=yes/no,E=P2,F=yes/no,G=P3,H=yes/no,I=energy,J=win
+      const logData = log.getRange("A4:J38").getValues();
 
       const window15 = logData.filter(r => {
         const d = parseSheetDate(r[0]);
@@ -249,7 +249,7 @@ function formatDates() {
   const log = ss.getSheetByName("📅 Daily Log");
   if (!log) { Logger.log("Daily Log sheet not found"); return; }
 
-  const dateRange = log.getRange("A4:A93");
+  const dateRange = log.getRange("A4:A38");
   dateRange.setNumberFormat("DD-MM-YYYY");
 
   const rule = SpreadsheetApp.newDataValidation()
@@ -277,18 +277,18 @@ function formatDates() {
     return;
   }
 
-  for (let i = 0; i < 90; i++) {
+  for (let i = 0; i < 35; i++) {
     const d = new Date(startDate);
     d.setDate(startDate.getDate() + i);
     log.getRange(4 + i, 1).setValue(d);
   }
 
-  for (let i = 0; i < 90; i++) {
+  for (let i = 0; i < 35; i++) {
     const r = 4 + i;
     log.getRange(r, 2).setFormula(`=TEXT(A${r},"DDD")`);
   }
 
-  log.getRange("A4:A93").setNumberFormat("DD-MM-YYYY");
+  log.getRange("A4:A38").setNumberFormat("DD-MM-YYYY");
 
   Logger.log("Dates formatted successfully from " + startDate.toDateString());
   SpreadsheetApp.getUi().alert("Done! Dates are now set from " + startDate.toDateString());
