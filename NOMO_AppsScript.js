@@ -308,13 +308,16 @@ function onFormSubmit(e) {
 
 Welcome to NOMO — your personal passion tracker is all set!
 
-Here's your tracker link:
+📊 Your Tracker (fill this daily):
 ${memberUrl}
 
 Your passions are already loaded:
 ${p1 ? "• " + p1 : ""}
 ${p2 ? "• " + p2 : ""}
 ${p3 ? "• " + p3 : ""}
+
+🏆 Leaderboard (see where you rank):
+https://nomo-leaderboard.streamlit.app/
 
 Start logging from today (${dateStr}). Fill in YES/NO, your energy (1-5), and today's win every day.
 
