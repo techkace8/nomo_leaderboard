@@ -327,7 +327,7 @@ ${p3 ? "• " + p3 : ""}
 🏆 Leaderboard (see where you rank):
 https://nomo-leaderboard.streamlit.app/
 
-Start logging from today. Fill in "YES/NO" for your passions, your energy (1-5), and "Today's Win" every day.
+Start logging from today, mark your "YES/NO" for each passion, rate your energy (1-5), and capture your "Today's Win" every day.
 
 Hit the Refresh button on the leaderboard anytime to see your latest score.
 
