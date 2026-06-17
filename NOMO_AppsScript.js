@@ -285,7 +285,8 @@ function onFormSubmit(e) {
     const dateStr = Utilities.formatDate(today, Session.getScriptTimeZone(), "dd-MM-yyyy");
 
     profile.getRange("D4").setValue(name);
-    profile.getRange("D5").setValue(dateStr);
+    profile.getRange("D5").setValue(today);
+    profile.getRange("D5").setNumberFormat("dd-MM-yyyy");
     profile.getRange("D6").setValue([p1, p2, p3].filter(p => p).length);
     if (p1) profile.getRange("C9").setValue(p1);
     if (p2) profile.getRange("C10").setValue(p2);
