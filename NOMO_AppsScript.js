@@ -299,9 +299,16 @@ function onFormSubmit(e) {
     const memberUrl = `https://docs.google.com/spreadsheets/d/${copyId}/edit`;
 
     // Write to sheet_link: Sl_no | URL | Email | Name
-    const lastRow = Math.max(linkTab.getLastRow(), 1);
-    const slNo = lastRow; // header is row 1, so lastRow gives correct sl_no
-    linkTab.appendRow([slNo, memberUrl, email, name]);
+    // Find actual last row with data (ignore rows with only Sl_no pre-filled)
+    const allRows = linkTab.getDataRange().getValues();
+    let lastDataRow = 1;
+    for (let i = 1; i < allRows.length; i++) {
+      if (allRows[i][1] && allRows[i][1].toString().startsWith("http")) {
+        lastDataRow = i + 1;
+      }
+    }
+    const slNo = lastDataRow; // next sl_no
+    linkTab.getRange(lastDataRow + 1, 1, 1, 4).setValues([[slNo, memberUrl, email, name]]);
 
     // Email the member
     const subject = "🎯 Your NOMO Passion Tracker is Ready!";
