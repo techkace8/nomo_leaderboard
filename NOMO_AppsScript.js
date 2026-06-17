@@ -7,6 +7,8 @@
 // Re-pasting this script never wipes the member list.
 
 const LINK_TAB = "sheet_link";  // tab holding member sheet URLs in column B
+const MEMBER_TEMPLATE_ID = "1OaO8jzrOtNmRoY9btCBYffhAfvv8Ei8rKPVqF7iO2AM"; // NOMO_passion_tracker_member
+const FORM_RESPONSES_TAB = "Form Responses 1";
 
 // Read member sheet URLs from the sheet_link tab (col B, row 2 downward).
 function getMenteeSheets() {
@@ -237,5 +239,97 @@ function doGet(e) {
   return ContentService
     .createTextOutput(JSON.stringify(out))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ─────────────────────────────────────────────────────────
+// ONBOARDING — fires on Google Form submit
+// Trigger: Form submit → onFormSubmit
+// ─────────────────────────────────────────────────────────
+
+function onFormSubmit(e) {
+  try {
+    const master = SpreadsheetApp.getActiveSpreadsheet();
+    const linkTab = master.getSheetByName(LINK_TAB);
+
+    // Read form response values
+    const row   = e.values;  // [Timestamp, Full Name, Email, Passion1, Passion2, Passion3]
+    const name  = (row[1] || "").toString().trim();
+    const email = (row[2] || "").toString().trim();
+    const p1    = (row[3] || "").toString().trim();
+    const p2    = (row[4] || "").toString().trim();
+    const p3    = (row[5] || "").toString().trim();
+
+    if (!name || !email) {
+      Logger.log("Onboarding skipped — missing name or email");
+      return;
+    }
+
+    // Check for duplicate email in sheet_link
+    const existingUrls = linkTab.getDataRange().getValues();
+    for (let i = 1; i < existingUrls.length; i++) {
+      if ((existingUrls[i][2] || "").toString().trim().toLowerCase() === email.toLowerCase()) {
+        Logger.log(`Duplicate email ${email} — skipping`);
+        return;
+      }
+    }
+
+    // Copy member template
+    const templateFile = DriveApp.getFileById(MEMBER_TEMPLATE_ID);
+    const copy = templateFile.makeCopy(`NOMO — ${name}`);
+    const copyId = copy.getId();
+    const memberSS = SpreadsheetApp.openById(copyId);
+
+    // Fill My Profile
+    const profile = memberSS.getSheetByName("👤 My Profile");
+    const today = new Date();
+    const dateStr = Utilities.formatDate(today, Session.getScriptTimeZone(), "dd-MM-yyyy");
+
+    profile.getRange("D4").setValue(name);
+    profile.getRange("D5").setValue(dateStr);
+    profile.getRange("D6").setValue([p1, p2, p3].filter(p => p).length);
+    if (p1) profile.getRange("C9").setValue(p1);
+    if (p2) profile.getRange("C10").setValue(p2);
+    if (p3) profile.getRange("C11").setValue(p3);
+
+    // Share with member (editor access)
+    copy.addEditor(email);
+
+    // Get the sheet URL
+    const memberUrl = `https://docs.google.com/spreadsheets/d/${copyId}/edit`;
+
+    // Write to sheet_link: Sl_no | URL | Email | Name
+    const lastRow = Math.max(linkTab.getLastRow(), 1);
+    const slNo = lastRow; // header is row 1, so lastRow gives correct sl_no
+    linkTab.appendRow([slNo, memberUrl, email, name]);
+
+    // Email the member
+    const subject = "🎯 Your NOMO Passion Tracker is Ready!";
+    const body = `Hi ${name},
+
+Welcome to NOMO — your personal passion tracker is all set!
+
+Here's your tracker link:
+${memberUrl}
+
+Your passions are already loaded:
+${p1 ? "• " + p1 : ""}
+${p2 ? "• " + p2 : ""}
+${p3 ? "• " + p3 : ""}
+
+Start logging from today (${dateStr}). Fill in YES/NO, your energy (1-5), and today's win every day.
+
+Your scores update on the leaderboard every hour.
+
+Let's go! 🚀
+
+— NOMO Team`;
+
+    MailApp.sendEmail(email, subject, body);
+
+    Logger.log(`Onboarded: ${name} (${email}) — ${memberUrl}`);
+
+  } catch(err) {
+    Logger.log("Onboarding error: " + err.message);
+  }
 }
 
