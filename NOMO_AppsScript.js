@@ -319,7 +319,7 @@ ${p3 ? "• " + p3 : ""}
 🏆 Leaderboard (see where you rank):
 https://nomo-leaderboard.streamlit.app/
 
-Start logging from today (${dateStr}). Fill in YES/NO, your energy (1-5), and today's win every day.
+Start logging from today (${dateStr}). Fill in "YES/NO", your energy (1-5), and "Today's Win" every day.
 
 Your scores update on the leaderboard every hour.
 
