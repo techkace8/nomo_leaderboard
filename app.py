@@ -346,7 +346,7 @@ _logo_b64 = _b64.b64encode(_pl.Path("nomo_logo.jpg").read_bytes()).decode()
 st.markdown(f'''
 <div style="display:flex;align-items:center;gap:16px;margin-bottom:4px">
   <img src="data:image/jpeg;base64,{_logo_b64}" style="height:64px;width:auto">
-  <div class="nomo-title"><em>Top Achievers</em></div>
+  <div class="nomo-title" style="font-size:3.4rem"><em>Top Achievers</em></div>
 </div>
 ''', unsafe_allow_html=True)
 st.markdown('<div class="nomo-tag">15-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
