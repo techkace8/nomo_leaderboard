@@ -341,8 +341,12 @@ stamp = synced if synced else "Sample data"
 last = st.session_state.get("last_refresh", 0.0)
 cooling = (time.time() - last) < COOLDOWN_SECONDS
 
-st.image("nomo_logo.jpg", width=160)
-st.markdown('<div class="nomo-title"><em>Top Achievers</em></div>', unsafe_allow_html=True)
+st.markdown('''
+<div style="display:flex;align-items:center;gap:20px">
+  <img src="app/static/nomo_logo.jpg" style="height:60px;width:auto">
+  <div class="nomo-title"><em>Top Achievers</em></div>
+</div>
+''', unsafe_allow_html=True)
 st.markdown('<div class="nomo-tag">15-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="nomo-updated">{stamp}</div>', unsafe_allow_html=True)
 
