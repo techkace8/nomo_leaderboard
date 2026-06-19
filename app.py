@@ -345,7 +345,7 @@ _c1, _c2 = st.columns([1, 3])
 with _c1:
     st.image("nomo_logo.jpg", width=140)
 with _c2:
-    st.markdown('<div class="nomo-title" style="padding-top:10px"><em>Top Achievers</em></div>', unsafe_allow_html=True)
+    st.markdown('<div class="nomo-title" style="padding-top:18px"><em>Top Achievers</em></div>', unsafe_allow_html=True)
 st.markdown('<div class="nomo-tag">15-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="nomo-updated">{stamp}</div>', unsafe_allow_html=True)
 
