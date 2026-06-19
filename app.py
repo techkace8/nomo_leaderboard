@@ -4,6 +4,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 import json
 import time
+import html
 import requests
 from datetime import datetime
 
@@ -319,7 +320,11 @@ using_sample = False
 if has_secrets():
     # Cloud path: auto-connect to the configured leaderboard
     df, err = load_sheet_from_secrets()
-    if err: st.error(f"Could not load live leaderboard: {err}")
+    # Don't expose raw exception text (may contain SA email / project / sheet id)
+    # to public viewers — show a generic message, keep details in server logs only.
+    if err:
+        print(f"[leaderboard load error] {err}")
+        st.error("Could not load the live leaderboard right now. Please try again shortly.")
 elif url and creds:
     # Manual path: credentials pasted in the sidebar
     df, err = load_sheet(url, creds)
@@ -337,7 +342,7 @@ if sc:
 
 # ── header ────────────────────────────────────────────────
 synced = df.attrs.get("synced", "") if df is not None else ""
-stamp = synced if synced else "Sample data"
+stamp = html.escape(synced) if synced else "Sample data"
 last = st.session_state.get("last_refresh", 0.0)
 cooling = (time.time() - last) < COOLDOWN_SECONDS
 
@@ -385,7 +390,7 @@ if using_sample:
 total = len(df)
 avg = round(df[sc].mean(), 1) if sc else "—"
 top = round(df[sc].max(), 1) if sc else "—"
-top_name = df[nc].iloc[0] if len(df) > 0 else "—"
+top_name = html.escape(str(df[nc].iloc[0])) if len(df) > 0 else "—"
 
 st.markdown(f"""
 <div class="metric-grid">
@@ -402,7 +407,7 @@ st.markdown('<div class="sec-title">Leaderboard</div>', unsafe_allow_html=True)
 lb_html = ""
 for _, row in df.iterrows():
     r = int(row.get("RANK", _ + 1))
-    name = str(row.get(nc, "—"))
+    name = html.escape(str(row.get(nc, "—")))  # member-controlled → escape for XSS
     score = float(row.get(sc, 0)) if sc else 0
     prev = row.get(pc, "") if pc else ""
     bl, bc = band(score)
@@ -432,7 +437,7 @@ if sc and len(df) > 0:
         win = next((row.get(c,"—") for c in df.columns if "WIN" in c.upper()), "—")
         prv = next((row.get(c,"—") for c in df.columns if "PREV" in c.upper()), "—")
         rows += f"""<tr>
-          <td>{row.get(nc,"—")}</td>
+          <td>{html.escape(str(row.get(nc,"—")))}</td>
           <td class="td-m">{stk}</td><td class="td-m">{eng}</td>
           <td class="td-m">{win}</td><td class="td-m">{prv}</td>
           <td class="td-score">{sv:.1f}</td>
