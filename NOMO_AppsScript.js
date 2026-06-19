@@ -104,12 +104,12 @@ function syncScores() {
       if (!name || name.includes("←")) return;  // skip unfilled profiles
 
       // read log A4:J38 — A=date,B=day,C=P1,D=yes/no,E=P2,F=yes/no,G=P3,H=yes/no,I=energy,J=win
-      const logData = log.getRange("A4:J38").getValues();
+      const logData = log.getRange("A4:K38").getValues();
 
       const window15 = logData.filter(r => {
         const d = parseSheetDate(r[0]);
         if (!d) return false;
-        if (!r[2] || r[2] === "") return false;
+        if (!r[10] || r[10] === "") return false;  // col K = any passion worked (OR of D/F/H)
         return d >= windowStart && d <= today;
       });
 
