@@ -95,16 +95,15 @@ function syncScores() {
   menteeSheets.forEach((url, i) => {
     try {
       const ss = SpreadsheetApp.openByUrl(url);
-      const profile = ss.getSheetByName("👤 My Profile");
       const log = ss.getSheetByName("📅 Daily Log");
-      if (!profile || !log) return;
+      if (!log) return;
 
       // name
-      let name = (profile.getRange("D4").getValue() || "").toString().trim();
+      let name = (log.getRange("D2").getValue() || "").toString().trim();
       if (!name || name.includes("←")) return;  // skip unfilled profiles
 
-      // read log A4:J38 — A=date,B=day,C=P1,D=yes/no,E=P2,F=yes/no,G=P3,H=yes/no,I=energy,J=win
-      const logData = log.getRange("A4:K38").getValues();
+      // read log A7:K39 — A=date,B=day,C=P1,D=yes/no,E=P2,F=yes/no,G=P3,H=yes/no,I=energy,J=win,K=any passion
+      const logData = log.getRange("A7:K39").getValues();
 
       const window15 = logData.filter(r => {
         const d = parseSheetDate(r[0]);
@@ -127,21 +126,18 @@ function syncScores() {
           }
         });
         streak = shownUpDays.size;
-        const streakScore = Math.min(streak / 15, 1) * 40;
+        const streakScore = Math.min(streak / 15, 1) * 50;
 
         // 2. AVG ENERGY (col I = index 8)
         const energies = window15.map(r => parseInt(r[8])).filter(e => !isNaN(e) && e > 0);
         avgEnergy = energies.length > 0 ? energies.reduce((a,b) => a+b, 0) / energies.length : 0;
         const energyScore = (avgEnergy / 5) * 30;
 
-        // 3. WINS (col J = index 9)
-        wins = window15.filter(r => r[9] && r[9].toString().trim() !== "").length;
+        // 3. WINS — days where energy >= 3 (truly committed)
+        wins = window15.filter(r => parseInt(r[8]) >= 3).length;
         const winsScore = Math.min(wins / 15, 1) * 20;
 
-        // 4. PARTICIPATION 10% — showed up at all
-        const participationScore = Math.min(streak / 15, 1) * 10;
-
-        total = Math.round((streakScore + energyScore + winsScore + participationScore) * 10) / 10;
+        total = Math.round((streakScore + energyScore + winsScore) * 10) / 10;
       }
 
       // PREV SCORE = today's daily baseline for this member (same for everyone,
@@ -279,18 +275,16 @@ function onFormSubmit(e) {
     const copyId = copy.getId();
     const memberSS = SpreadsheetApp.openById(copyId);
 
-    // Fill My Profile
-    const profile = memberSS.getSheetByName("👤 My Profile");
+    // Fill Daily Log header
+    const memberLog = memberSS.getSheetByName("📅 Daily Log");
     const today = new Date();
-    const dateStr = Utilities.formatDate(today, Session.getScriptTimeZone(), "dd-MM-yyyy");
 
-    profile.getRange("D4").setValue(name);
-    profile.getRange("D5").setValue(today);
-    profile.getRange("D5").setNumberFormat("dd-MM-yyyy");
-    profile.getRange("D6").setValue([p1, p2, p3].filter(p => p).length);
-    if (p1) profile.getRange("C9").setValue(p1);
-    if (p2) profile.getRange("C10").setValue(p2);
-    if (p3) profile.getRange("C11").setValue(p3);
+    memberLog.getRange("D2").setValue(name);
+    memberLog.getRange("F2").setValue(today);
+    memberLog.getRange("F2").setNumberFormat("dd-MM-yyyy");
+    if (p1) memberLog.getRange("H2").setValue(p1);
+    if (p2) memberLog.getRange("H3").setValue(p2);
+    if (p3) memberLog.getRange("H4").setValue(p3);
 
     // Share with member (editor access)
     copy.addEditor(email);

@@ -7,8 +7,13 @@ sys.stdout.reconfigure(encoding="utf-8")
 from datetime import date, timedelta
 from nomo_sheet import open_sheet
 
-ss = open_sheet()
-trk = ss.worksheet("📅 Tracker")
+import gspread
+from google.oauth2.service_account import Credentials
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+creds = Credentials.from_service_account_file("service_account.json", scopes=SCOPES)
+gc = gspread.authorize(creds)
+ss = gc.open_by_key("1OaO8jzrOtNmRoY9btCBYffhAfvv8Ei8rKPVqF7iO2AM")  # member sheet
+trk = ss.worksheet("🎯 Tracker")
 log = ss.worksheet("📅 Daily Log")
 
 EPOCH = date(1899, 12, 30)
