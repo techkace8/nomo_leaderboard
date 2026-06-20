@@ -6,7 +6,7 @@
 // NOT in this code. To add a member: add a row in sheet_link with their URL.
 // Re-pasting this script never wipes the member list.
 
-const LINK_TAB = "sheet_link";  // tab holding member sheet URLs in column B
+const LINK_TAB = "🔗 Sheet Link";  // tab holding member sheet URLs in column B
 const MEMBER_TEMPLATE_ID = "1OaO8jzrOtNmRoY9btCBYffhAfvv8Ei8rKPVqF7iO2AM"; // NOMO_passion_tracker_member
 const FORM_RESPONSES_TAB = "Form Responses 1";
 
