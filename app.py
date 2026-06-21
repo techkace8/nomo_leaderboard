@@ -354,7 +354,7 @@ st.markdown(f'''
   <div class="nomo-title" style="font-size:3.4rem"><em>Top Achievers</em></div>
 </div>
 ''', unsafe_allow_html=True)
-st.markdown('<div class="nomo-tag">15-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
+st.markdown('<div class="nomo-tag">7-day rolling · Discover → Track → Connect → Build → Sustain</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="nomo-updated">{stamp}</div>', unsafe_allow_html=True)
 
 # Refresh button — full width on mobile, right-aligned pill on desktop via CSS
@@ -397,7 +397,7 @@ st.markdown(f"""
   <div class="metric-cell"><div class="metric-lbl">Multipassionates</div><div class="metric-val">{total}</div><div class="metric-sub">in Total</div></div>
   <div class="metric-cell"><div class="metric-lbl">Avg score</div><div class="metric-val">{avg}</div><div class="metric-sub">out of 100</div></div>
   <div class="metric-cell"><div class="metric-lbl">Top score</div><div class="metric-val">{top}</div><div class="metric-sub">{top_name}</div></div>
-  <div class="metric-cell"><div class="metric-lbl">Window</div><div class="metric-val">15</div><div class="metric-sub">rolling days</div></div>
+  <div class="metric-cell"><div class="metric-lbl">Window</div><div class="metric-val">7</div><div class="metric-sub">rolling days</div></div>
 </div>
 """, unsafe_allow_html=True)
 

@@ -54,7 +54,7 @@ function syncScores() {
 
   const today = new Date(); today.setHours(0,0,0,0);
   const windowStart = new Date(today);
-  windowStart.setDate(today.getDate() - 15);
+  windowStart.setDate(today.getDate() - 7);
 
   const menteeSheets = getMenteeSheets();   // URLs from the sheet_link tab
   Logger.log(`Found ${menteeSheets.length} member sheet(s) in "${LINK_TAB}"`);
@@ -126,7 +126,7 @@ function syncScores() {
           }
         });
         streak = shownUpDays.size;
-        const streakScore = Math.min(streak / 15, 1) * 50;
+        const streakScore = Math.min(streak / 7, 1) * 50;
 
         // 2. AVG ENERGY (col I = index 8)
         const energies = window15.map(r => parseInt(r[8])).filter(e => !isNaN(e) && e > 0);
@@ -135,7 +135,7 @@ function syncScores() {
 
         // 3. WINS — days where energy >= 3 (truly committed)
         wins = window15.filter(r => parseInt(r[8]) >= 3).length;
-        const winsScore = Math.min(wins / 15, 1) * 20;
+        const winsScore = Math.min(wins / 7, 1) * 20;
 
         total = Math.round((streakScore + energyScore + winsScore) * 10) / 10;
       }
