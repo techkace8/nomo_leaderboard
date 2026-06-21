@@ -6,9 +6,13 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets","https://www.googleapis
 creds = Credentials.from_service_account_file("service_account.json", scopes=SCOPES)
 gc = gspread.authorize(creds)
 
-WINDOW = 7  # rolling window in days — keep in sync with NOMO_AppsScript.js
-
-W      = f"(A$7:A$39>=TODAY()-{WINDOW})*(A$7:A$39<=TODAY())"
+WINDOW = 7  # week length in days — keep in sync with NOMO_AppsScript.js
+# Weekly RESET aligned to the member's start date (F2). The current week starts at
+#   weekStart = F2 + INT((TODAY()-F2)/WINDOW) * WINDOW
+# so day WINDOW+1 begins a fresh week (start 14th: wk1=14..20; day8=21st starts
+# wk2 and only the 21st counts until that week fills).
+WEEKSTART = f"($F$2+INT((TODAY()-$F$2)/{WINDOW})*{WINDOW})"
+W      = f"(A$7:A$39>={WEEKSTART})*(A$7:A$39<=TODAY())"
 STREAK = f"SUMPRODUCT({W}*(K$7:K$39=\"Yes\"))"
 SUME   = f"SUMPRODUCT({W}*ISNUMBER(I$7:I$39)*I$7:I$39)"
 CNTE   = f"SUMPRODUCT({W}*ISNUMBER(I$7:I$39))"

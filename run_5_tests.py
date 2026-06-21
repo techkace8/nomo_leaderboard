@@ -2,7 +2,7 @@
 5 test cases — write to Tracker, predict from Tracker, verify from Daily Log.
 No cross-contamination between prediction and verification.
 """
-import sys, time
+import sys, time, math
 sys.stdout.reconfigure(encoding="utf-8")
 from datetime import date, timedelta
 from nomo_sheet import open_sheet
@@ -68,9 +68,12 @@ def predict_from_tracker():
     p2_rows = data[7:12]
     p3_rows = data[14:19]
 
+    WINDOW = 7  # keep in sync with J2 formula + NOMO_AppsScript.js
     today = date.today()
     today_serial = (today - EPOCH).days
-    window_start = today_serial - 15
+    # Weekly RESET aligned to start date: window = current week's start .. today
+    days_since_start = today_serial - int(start_serial)
+    window_start = int(start_serial) + (days_since_start // WINDOW) * WINDOW
 
     def checked(row, col):
         try: return bool(row[col])
@@ -86,28 +89,30 @@ def predict_from_tracker():
         p2 = sum(1 for r in p2_rows if checked(r, day_idx))
         p3 = sum(1 for r in p3_rows if checked(r, day_idx))
         total = p1 + p2 + p3
+        # Mirror the sheet exactly: energy = MIN(ROUND(total/b35*5),5), no floor.
+        # ROUND is half-up (Sheets), and energy 0 -> blank I cell (excluded below).
         energy_raw = total / b35 * 5 if b35 else 0
-        energy = min(round(energy_raw), 5)
-        energy = max(1, energy) if total > 0 else 0
-        k_yes = total > 0
+        energy = min(math.floor(energy_raw + 0.5), 5) if total > 0 else 0
+        k_yes = total > 0           # any subtask checked -> col K = "Yes" (streak)
         in_window = window_start <= day_serial <= today_serial
         day_date = EPOCH + timedelta(days=int(day_serial))
         if in_window and k_yes:
             streak += 1
+        if in_window and energy >= 1:   # only numeric (non-blank) energy counts to avg
             energy_sum += energy
             energy_cnt += 1
-        if in_window and k_yes:
+        win_day = in_window and energy >= 3   # wins = days energy >= 3
+        if win_day:
             wins += 1
-        lines.append(f"  day{day_idx+1} {day_date} P1={p1} P2={p2} P3={p3} E={energy} K={'Y' if k_yes else 'N'} win={'Y' if (in_window and k_yes) else 'N'}")
+        lines.append(f"  day{day_idx+1} {day_date} P1={p1} P2={p2} P3={p3} E={energy} K={'Y' if k_yes else 'N'} win={'Y' if win_day else 'N'}")
 
     avg_e = energy_sum / energy_cnt if energy_cnt else 0
-    s = min(streak,15)/15*40
+    s = min(streak,WINDOW)/WINDOW*50
     e = avg_e/5*30
-    w = min(wins,15)/15*20
-    p = min(streak,15)/15*10
-    total_score = round(s+e+w+p, 1)
+    w = min(wins,WINDOW)/WINDOW*20
+    total_score = round(s+e+w, 1)
     lines.append(f"  Streak={streak} AvgE={avg_e:.2f} Wins={wins}")
-    lines.append(f"  S/40={s:.1f} E/30={e:.1f} W/20={w:.1f} P/10={p:.1f} => {total_score}")
+    lines.append(f"  S/50={s:.1f} E/30={e:.1f} W/20={w:.1f} => {total_score}")
     return total_score, lines
 
 def verify_from_dlog(expected_streak_nonzero=True):

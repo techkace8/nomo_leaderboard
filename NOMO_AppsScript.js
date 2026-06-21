@@ -53,8 +53,7 @@ function syncScores() {
   const lb = master.getSheetByName("🏆 Top_Achievers");
 
   const today = new Date(); today.setHours(0,0,0,0);
-  const windowStart = new Date(today);
-  windowStart.setDate(today.getDate() - 7);
+  const WINDOW = 7;  // week length in days — keep in sync with the J2 formula
 
   const menteeSheets = getMenteeSheets();   // URLs from the sheet_link tab
   Logger.log(`Found ${menteeSheets.length} member sheet(s) in "${LINK_TAB}"`);
@@ -102,6 +101,16 @@ function syncScores() {
       let name = (log.getRange("D2").getValue() || "").toString().trim();
       if (!name || name.includes("←")) return;  // skip unfilled profiles
 
+      // ── Weekly RESET window, aligned to this member's start date (F2) ──────
+      // weekStart = start + floor((today-start)/WINDOW)*WINDOW. Day WINDOW+1
+      // begins a fresh week, so only the new week's days score.
+      const start = parseSheetDate(log.getRange("F2").getValue());
+      if (!start) return;  // skip if start date not set
+      const daysSinceStart = Math.floor((today - start) / 86400000);
+      if (daysSinceStart < 0) return;  // start date in the future
+      const weekStart = new Date(start);
+      weekStart.setDate(start.getDate() + Math.floor(daysSinceStart / WINDOW) * WINDOW);
+
       // read log A7:K39 — A=date,B=day,C=P1,D=yes/no,E=P2,F=yes/no,G=P3,H=yes/no,I=energy,J=win,K=any passion
       const logData = log.getRange("A7:K39").getValues();
 
@@ -109,10 +118,10 @@ function syncScores() {
         const d = parseSheetDate(r[0]);
         if (!d) return false;
         if (!r[10] || r[10] === "") return false;  // col K = any passion worked (OR of D/F/H)
-        return d >= windowStart && d <= today;
+        return d >= weekStart && d <= today;
       });
 
-      Logger.log(`${name}: ${window15.length} rows in 15-day window`);
+      Logger.log(`${name}: ${window15.length} rows in current week (from ${weekStart.toDateString()})`);
 
       let streak = 0, avgEnergy = 0, wins = 0, total = 0;
       if (window15.length > 0) {
@@ -126,7 +135,7 @@ function syncScores() {
           }
         });
         streak = shownUpDays.size;
-        const streakScore = Math.min(streak / 7, 1) * 50;
+        const streakScore = Math.min(streak / WINDOW, 1) * 50;
 
         // 2. AVG ENERGY (col I = index 8)
         const energies = window15.map(r => parseInt(r[8])).filter(e => !isNaN(e) && e > 0);
@@ -135,7 +144,7 @@ function syncScores() {
 
         // 3. WINS — days where energy >= 3 (truly committed)
         wins = window15.filter(r => parseInt(r[8]) >= 3).length;
-        const winsScore = Math.min(wins / 7, 1) * 20;
+        const winsScore = Math.min(wins / WINDOW, 1) * 20;
 
         total = Math.round((streakScore + energyScore + winsScore) * 10) / 10;
       }
