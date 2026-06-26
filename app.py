@@ -27,8 +27,6 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 html,body,[class*="css"]{font-family:'Inter',sans-serif!important;background:#ffffff!important}
-div[data-testid="stVerticalBlockBorderWrapper"],div[data-testid="stVerticalBlock"]{gap:0!important}
-div[data-testid="element-container"]{margin-bottom:0!important}
 [data-testid="stAppViewContainer"],[data-testid="stMain"],[data-testid="block-container"]{background:#ffffff!important}
 .block-container{padding:3rem 4rem 5rem!important;max-width:1000px!important}
 #MainMenu,footer,header{visibility:hidden!important}
