@@ -49,9 +49,8 @@ button[kind="header"]{display:none!important}
 .info-bar{background:#f8f8f6;border-left:3px solid #1a6b4a;padding:10px 16px;font-size:12px;color:#666;font-family:monospace;margin-bottom:28px}
 
 /* METRICS */
-.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:2px solid #111;margin-bottom:36px}
-.metric-cell{padding:12px 16px;border-right:2px solid #111;text-align:center}
-.metric-cell:last-child{border-right:none}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.metric-cell{padding:12px 10px;text-align:center;background:#fff;border:1.5px solid #111;border-radius:10px}
 .metric-lbl{font-size:8px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#aaa;font-family:monospace;margin-bottom:4px}
 .metric-val{font-family:'DM Serif Display',serif;font-size:1.6rem;font-weight:700;color:#111;line-height:1}
 .metric-sub{font-size:10px;color:#aaa;margin-top:3px}
