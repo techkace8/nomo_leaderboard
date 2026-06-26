@@ -50,11 +50,11 @@ button[kind="header"]{display:none!important}
 
 /* METRICS */
 .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:2px solid #111;margin-bottom:36px}
-.metric-cell{padding:20px 22px;border-right:2px solid #111}
+.metric-cell{padding:12px 16px;border-right:2px solid #111}
 .metric-cell:last-child{border-right:none}
-.metric-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#aaa;font-family:monospace;margin-bottom:8px}
-.metric-val{font-family:'DM Serif Display',serif;font-size:2.4rem;font-weight:700;color:#111;line-height:1}
-.metric-sub{font-size:11px;color:#aaa;margin-top:4px}
+.metric-lbl{font-size:8px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#aaa;font-family:monospace;margin-bottom:4px}
+.metric-val{font-family:'DM Serif Display',serif;font-size:1.6rem;font-weight:700;color:#111;line-height:1}
+.metric-sub{font-size:10px;color:#aaa;margin-top:3px}
 
 /* SECTION TITLE */
 .sec-title{font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#aaa;font-family:monospace;margin-bottom:14px}
@@ -383,6 +383,8 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('<hr class="nomo-divider">', unsafe_allow_html=True)
 
+st.markdown('<div class="nomo-title" style="font-size:2.2rem;margin-bottom:24px"><em>Passion-Habit Leaderboard</em></div>', unsafe_allow_html=True)
+
 if using_sample:
     st.markdown('<div class="info-bar">Sample data — connect your Top_Achievers sheet in the sidebar to go live</div>', unsafe_allow_html=True)
 
@@ -402,7 +404,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ── leaderboard ───────────────────────────────────────────
-st.markdown('<div class="sec-title">Leaderboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="nomo-title" style="font-size:1.1rem;margin-bottom:14px;color:#aaa"><em>Leaderboard</em></div>', unsafe_allow_html=True)
 
 lb_html = ""
 for _, row in df.iterrows():
