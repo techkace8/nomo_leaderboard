@@ -396,7 +396,6 @@ top_name = html.escape(str(df[nc].iloc[0])) if len(df) > 0 else "—"
 st.markdown(f"""
 {sample_bar}
 <div style="text-align:center;margin-top:4px;margin-bottom:4px"><img src="data:image/jpeg;base64,{_ph_b64}" style="max-width:480px;width:80%"></div>
-<hr style="border:none;border-top:2px solid #111;margin:4px 0">
 <div style="display:flex;justify-content:center;margin-bottom:4px">
 <div class="metric-grid" style="max-width:600px;width:100%">
   <div class="metric-cell"><div class="metric-lbl">Multipassionates</div><div class="metric-val">{total}</div><div class="metric-sub">in Total</div></div>
