@@ -50,7 +50,7 @@ button[kind="header"]{display:none!important}
 
 /* METRICS */
 .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:2px solid #111;margin-bottom:36px}
-.metric-cell{padding:12px 16px;border-right:2px solid #111}
+.metric-cell{padding:12px 16px;border-right:2px solid #111;text-align:center}
 .metric-cell:last-child{border-right:none}
 .metric-lbl{font-size:8px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#aaa;font-family:monospace;margin-bottom:4px}
 .metric-val{font-family:'DM Serif Display',serif;font-size:1.6rem;font-weight:700;color:#111;line-height:1}
@@ -397,7 +397,7 @@ st.markdown(f"""
 <div style="text-align:center;margin-top:4px;margin-bottom:4px"><img src="data:image/jpeg;base64,{_ph_b64}" style="max-width:480px;width:80%"></div>
 <div style="display:flex;justify-content:center;margin-bottom:4px">
 <div class="metric-grid" style="max-width:600px;width:100%">
-  <div class="metric-cell"><div class="metric-lbl">MULTI<br>PASS</div><div class="metric-val">{total}</div><div class="metric-sub">in Total</div></div>
+  <div class="metric-cell"><div class="metric-lbl">Members</div><div class="metric-val">{total}</div><div class="metric-sub">in Total</div></div>
   <div class="metric-cell"><div class="metric-lbl">Avg score</div><div class="metric-val">{avg}</div><div class="metric-sub">out of 100</div></div>
   <div class="metric-cell"><div class="metric-lbl">Top score</div><div class="metric-val">{top}</div><div class="metric-sub">{top_name}</div></div>
   <div class="metric-cell"><div class="metric-lbl">Window</div><div class="metric-val">7</div><div class="metric-sub">rolling days</div></div>
