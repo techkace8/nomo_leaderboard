@@ -397,7 +397,7 @@ st.markdown(f"""
 <div style="text-align:center;margin-top:4px;margin-bottom:4px"><img src="data:image/jpeg;base64,{_ph_b64}" style="max-width:480px;width:80%"></div>
 <div style="display:flex;justify-content:center;margin-bottom:4px">
 <div class="metric-grid" style="max-width:600px;width:100%">
-  <div class="metric-cell"><div class="metric-lbl">Multipassionates</div><div class="metric-val">{total}</div><div class="metric-sub">in Total</div></div>
+  <div class="metric-cell"><div class="metric-lbl">MULTI<br>PASS</div><div class="metric-val">{total}</div><div class="metric-sub">in Total</div></div>
   <div class="metric-cell"><div class="metric-lbl">Avg score</div><div class="metric-val">{avg}</div><div class="metric-sub">out of 100</div></div>
   <div class="metric-cell"><div class="metric-lbl">Top score</div><div class="metric-val">{top}</div><div class="metric-sub">{top_name}</div></div>
   <div class="metric-cell"><div class="metric-lbl">Window</div><div class="metric-val">7</div><div class="metric-sub">rolling days</div></div>
