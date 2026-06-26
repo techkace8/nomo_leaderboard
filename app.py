@@ -383,7 +383,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('<hr class="nomo-divider">', unsafe_allow_html=True)
 
-st.markdown('<div class="nomo-title" style="font-size:2.2rem;margin-bottom:24px"><em>Passion-Habit Leaderboard</em></div>', unsafe_allow_html=True)
+st.markdown('<div class="nomo-title" style="font-size:2.2rem;margin-bottom:24px;text-align:center"><span style="color:#1e3a5f">PASSION</span><span style="color:#8b7bb5">-</span><span style="color:#7aad8e">HABIT</span><br><span style="color:#1e3a5f">LEADERBOARD</span></div>', unsafe_allow_html=True)
 
 if using_sample:
     st.markdown('<div class="info-bar">Sample data — connect your Top_Achievers sheet in the sidebar to go live</div>', unsafe_allow_html=True)
@@ -395,16 +395,17 @@ top = round(df[sc].max(), 1) if sc else "—"
 top_name = html.escape(str(df[nc].iloc[0])) if len(df) > 0 else "—"
 
 st.markdown(f"""
-<div class="metric-grid">
+<div style="display:flex;justify-content:center;margin-bottom:24px">
+<div class="metric-grid" style="max-width:600px;width:100%">
   <div class="metric-cell"><div class="metric-lbl">Multipassionates</div><div class="metric-val">{total}</div><div class="metric-sub">in Total</div></div>
   <div class="metric-cell"><div class="metric-lbl">Avg score</div><div class="metric-val">{avg}</div><div class="metric-sub">out of 100</div></div>
   <div class="metric-cell"><div class="metric-lbl">Top score</div><div class="metric-val">{top}</div><div class="metric-sub">{top_name}</div></div>
   <div class="metric-cell"><div class="metric-lbl">Window</div><div class="metric-val">7</div><div class="metric-sub">rolling days</div></div>
 </div>
+</div>
 """, unsafe_allow_html=True)
 
 # ── leaderboard ───────────────────────────────────────────
-st.markdown('<div class="nomo-title" style="font-size:1.1rem;margin-bottom:14px;color:#aaa"><em>Leaderboard</em></div>', unsafe_allow_html=True)
 
 lb_html = ""
 for _, row in df.iterrows():
