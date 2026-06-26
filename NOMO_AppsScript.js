@@ -286,10 +286,9 @@ function onFormSubmit(e) {
 
     // Fill Daily Log header
     const memberLog = memberSS.getSheetByName("📅 Daily Log");
-    const today = new Date();
-
+    const istStr = Utilities.formatDate(new Date(), "Asia/Kolkata", "dd-MM-yyyy");
     memberLog.getRange("D2").setValue(name);
-    memberLog.getRange("F2").setValue(today);
+    memberLog.getRange("F2").setValue(istStr);
     memberLog.getRange("F2").setNumberFormat("dd-MM-yyyy");
     if (p1) memberLog.getRange("H2").setValue(p1);
     if (p2) memberLog.getRange("H3").setValue(p2);
@@ -330,7 +329,7 @@ ${p3 ? "• " + p3 : ""}
 🏆 Leaderboard (see where you rank):
 https://nomo-leaderboard.streamlit.app/
 
-Start logging from today, mark your "YES/NO" for each passion, rate your energy (1-5), and capture your "Today's Win" every day.
+Start logging from today — just tick your checkboxes for each passion. Energy (1-5) and streak are calculated automatically. No manual entry needed!
 
 Hit the Refresh button on the leaderboard anytime to see your latest score.
 
