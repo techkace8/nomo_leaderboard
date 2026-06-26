@@ -383,7 +383,8 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('<hr class="nomo-divider">', unsafe_allow_html=True)
 
-st.markdown('<div class="nomo-title" style="font-size:2.2rem;margin-bottom:24px;text-align:center"><span style="color:#1e3a5f">PASSION</span><span style="color:#8b7bb5">-</span><span style="color:#7aad8e">HABIT</span><br><span style="color:#1e3a5f">LEADERBOARD</span></div>', unsafe_allow_html=True)
+_ph_b64 = _b64.b64encode(_pl.Path("passion_habit.jpeg").read_bytes()).decode()
+st.markdown(f'<div style="text-align:center;margin-bottom:24px"><img src="data:image/jpeg;base64,{_ph_b64}" style="max-width:480px;width:80%"></div>', unsafe_allow_html=True)
 
 if using_sample:
     st.markdown('<div class="info-bar">Sample data — connect your Top_Achievers sheet in the sidebar to go live</div>', unsafe_allow_html=True)
