@@ -147,13 +147,12 @@ div[data-testid="stButton"] > button:focus{box-shadow:none!important;outline:non
   .nomo-divider{margin:10px 0 18px!important}
   div[data-testid="stButton"] > button{margin-top:4px!important;padding:8px 4px!important;font-size:11px!important}
 
-  /* metrics: 2x2 grid */
-  .metric-grid{grid-template-columns:repeat(2,1fr)!important}
-  .metric-cell{padding:16px 14px!important}
-  .metric-val{font-size:2rem!important}
-  .metric-cell:nth-child(2){border-right:none!important}
-  .metric-cell:nth-child(3){border-top:2px solid #111!important}
-  .metric-cell:nth-child(4){border-top:2px solid #111!important;border-right:none!important}
+  /* metrics: 4 in one row, compact */
+  .metric-grid{grid-template-columns:repeat(4,1fr)!important}
+  .metric-cell{padding:8px 6px!important}
+  .metric-val{font-size:1.1rem!important}
+  .metric-lbl{font-size:7px!important}
+  .metric-sub{font-size:8px!important}
 
   /* leaderboard: name+score+badge on row 1, full-width bar on row 2 */
   .lb-row{flex-wrap:wrap;gap:7px 10px;padding:13px 14px}
