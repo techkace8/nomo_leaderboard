@@ -381,10 +381,10 @@ else:
             st.toast(f"Refresh failed: {msg}", icon="⚠️")
 st.markdown('</div>', unsafe_allow_html=True)
 
-st.markdown('<hr class="nomo-divider" style="margin-bottom:12px">', unsafe_allow_html=True)
+st.markdown('<hr class="nomo-divider" style="margin-bottom:4px">', unsafe_allow_html=True)
 
 _ph_b64 = _b64.b64encode(_pl.Path("passion_habit.jpeg").read_bytes()).decode()
-st.markdown(f'<div style="text-align:center;margin-bottom:12px"><img src="data:image/jpeg;base64,{_ph_b64}" style="max-width:480px;width:80%"></div>', unsafe_allow_html=True)
+st.markdown(f'<div style="text-align:center;margin-top:-32px;margin-bottom:8px"><img src="data:image/jpeg;base64,{_ph_b64}" style="max-width:480px;width:80%"></div>', unsafe_allow_html=True)
 
 if using_sample:
     st.markdown('<div class="info-bar">Sample data — connect your Top_Achievers sheet in the sidebar to go live</div>', unsafe_allow_html=True)
