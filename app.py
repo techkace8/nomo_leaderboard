@@ -382,21 +382,22 @@ else:
 st.markdown('</div>', unsafe_allow_html=True)
 
 _ph_b64 = _b64.b64encode(_pl.Path("passion_habit.jpeg").read_bytes()).decode()
-st.markdown(f'<div style="text-align:center;margin-top:8px;margin-bottom:8px"><img src="data:image/jpeg;base64,{_ph_b64}" style="max-width:480px;width:80%"></div>', unsafe_allow_html=True)
-
-st.markdown('<hr class="nomo-divider" style="margin-bottom:4px">', unsafe_allow_html=True)
 
 if using_sample:
-    st.markdown('<div class="info-bar">Sample data — connect your Top_Achievers sheet in the sidebar to go live</div>', unsafe_allow_html=True)
+    sample_bar = '<div class="info-bar">Sample data — connect your Top_Achievers sheet in the sidebar to go live</div>'
+else:
+    sample_bar = ""
 
-# ── metrics ───────────────────────────────────────────────
 total = len(df)
 avg = round(df[sc].mean(), 1) if sc else "—"
 top = round(df[sc].max(), 1) if sc else "—"
 top_name = html.escape(str(df[nc].iloc[0])) if len(df) > 0 else "—"
 
 st.markdown(f"""
-<div style="display:flex;justify-content:center;margin-bottom:24px">
+{sample_bar}
+<div style="text-align:center;margin-top:4px;margin-bottom:4px"><img src="data:image/jpeg;base64,{_ph_b64}" style="max-width:480px;width:80%"></div>
+<hr style="border:none;border-top:2px solid #111;margin:4px 0">
+<div style="display:flex;justify-content:center;margin-bottom:4px">
 <div class="metric-grid" style="max-width:600px;width:100%">
   <div class="metric-cell"><div class="metric-lbl">Multipassionates</div><div class="metric-val">{total}</div><div class="metric-sub">in Total</div></div>
   <div class="metric-cell"><div class="metric-lbl">Avg score</div><div class="metric-val">{avg}</div><div class="metric-sub">out of 100</div></div>
